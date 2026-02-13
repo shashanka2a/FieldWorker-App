@@ -38,6 +38,26 @@ interface ReportPreviewProps {
   signedAt?: string | null;
 }
 
+/** Renders a small photo grid from data URLs */
+function PhotoGrid({ photos, label }: { photos: string[]; label?: string }) {
+  if (!photos?.length) return null;
+  return (
+    <div className="mt-2">
+      {label && <p className="text-xs font-medium text-gray-500 mb-1">{label}</p>}
+      <div className="flex flex-wrap gap-2">
+        {photos.map((src, i) => (
+          <img
+            key={i}
+            src={src}
+            alt={`Photo ${i + 1}`}
+            className="w-20 h-20 object-cover rounded border border-gray-200 print:break-inside-avoid"
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function ReportPreview({
   data,
   preparedBy = "Field User",
@@ -50,213 +70,234 @@ export function ReportPreview({
     [data.survey]
   );
 
+  const sectionClass = "border-b border-gray-200 px-6 py-4";
+  const sectionTitleClass = "text-xs font-bold uppercase tracking-wide text-gray-500 mb-2";
+
   return (
-    <div className="bg-white text-black max-w-[210mm] mx-auto min-h-screen print:shadow-none">
-      {/* Header */}
-      <header className="border-b-2 border-black px-6 py-4">
-        <h1 className="text-xl font-bold">{data.projectName}</h1>
-        <p className="text-sm text-gray-600">Daily Field Report</p>
-        <div className="mt-2 flex justify-between text-sm">
-          <span>Date: {formatReportDate(data.date)}</span>
-          <span>Prepared by: {data.signed?.preparedBy ?? preparedBy}</span>
+    <div className="bg-white text-gray-900 max-w-[210mm] mx-auto min-h-screen print:shadow-none font-sans text-sm">
+      {/* Header - branded */}
+      <header className="bg-gray-50 border-b-2 border-gray-300 px-6 py-5">
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-lg font-bold text-gray-900">{data.projectName}</h1>
+            <p className="text-sm text-gray-600 mt-0.5">Daily Field Report</p>
+          </div>
+          <div className="text-right text-sm text-gray-600">
+            <div>Date: <span className="font-medium text-gray-900">{formatReportDate(data.date)}</span></div>
+            <div className="mt-1">Prepared by: <span className="font-medium text-gray-900">{data.signed?.preparedBy ?? preparedBy}</span></div>
+          </div>
         </div>
       </header>
 
-      {/* Weather placeholder */}
-      <section className="border-b border-gray-300 px-6 py-3">
-        <h2 className="text-sm font-semibold uppercase text-gray-600">Weather</h2>
-        <div className="grid grid-cols-3 gap-4 text-sm">
-          <div>
-            <div className="font-medium">7:00 AM</div>
-            <div className="text-gray-600">—</div>
-          </div>
-          <div>
-            <div className="font-medium">12:00 PM</div>
-            <div className="text-gray-600">—</div>
-          </div>
-          <div>
-            <div className="font-medium">4:00 PM</div>
-            <div className="text-gray-600">—</div>
-          </div>
+      {/* Weather */}
+      <section className={sectionClass}>
+        <h2 className={sectionTitleClass}>1. Weather</h2>
+        <div className="grid grid-cols-3 gap-3 text-sm">
+          <div className="bg-gray-50 rounded p-2"><span className="font-medium">7:00 AM</span><span className="text-gray-500 ml-1">—</span></div>
+          <div className="bg-gray-50 rounded p-2"><span className="font-medium">12:00 PM</span><span className="text-gray-500 ml-1">—</span></div>
+          <div className="bg-gray-50 rounded p-2"><span className="font-medium">4:00 PM</span><span className="text-gray-500 ml-1">—</span></div>
         </div>
       </section>
 
-      {/* General Notes */}
-      <section className="border-b border-gray-300 px-6 py-3">
-        <h2 className="text-sm font-semibold uppercase text-gray-600">General Notes</h2>
+      {/* 2. General Notes */}
+      <section className={sectionClass}>
+        <h2 className={sectionTitleClass}>2. General Notes</h2>
         {data.notes.length === 0 ? (
-          <p className="text-sm text-gray-500 italic">No notes for this date.</p>
+          <p className="text-gray-500 italic">No notes for this date.</p>
         ) : (
-          <ol className="list-decimal space-y-2 pl-4 text-sm">
+          <div className="space-y-3">
             {data.notes.map((n, i) => (
-              <li key={n.id}>
-                <span>{n.notes || "(No content)"}</span>
-                <span className="ml-2 text-gray-500">
-                  {preparedBy} | {formatShortDate(n.timestamp)}
-                </span>
-              </li>
+              <div key={n.id} className="border-l-2 border-gray-300 pl-3 py-1">
+                <p className="text-gray-900">{n.notes || "(No content)"}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{preparedBy} | {formatShortDate(n.timestamp)} | Category: {n.category}</p>
+                <PhotoGrid photos={n.photos ?? []} />
+              </div>
             ))}
-          </ol>
+          </div>
         )}
       </section>
 
-      {/* Chemicals */}
-      {data.chemicals.length > 0 && (
-        <section className="border-b border-gray-300 px-6 py-3">
-          <h2 className="text-sm font-semibold uppercase text-gray-600">Chemicals</h2>
-          <ul className="space-y-1 text-sm">
+      {/* 3. Chemicals */}
+      <section className={sectionClass}>
+        <h2 className={sectionTitleClass}>3. Chemicals</h2>
+        {data.chemicals.length === 0 ? (
+          <p className="text-gray-500 italic">No chemical entries for this date.</p>
+        ) : (
+          <div className="space-y-2">
             {data.chemicals.map((c) => (
-              <li key={c.id}>
-                {c.chemicals.map((ch) => `${ch.name}: ${ch.quantity} ${ch.unit}`).join(", ")}
-                {c.notes && ` — ${c.notes}`}
-                <span className="ml-2 text-gray-500">{formatShortDate(c.timestamp)}</span>
-              </li>
+              <div key={c.id} className="bg-gray-50 rounded p-2">
+                <p className="text-gray-900">
+                  {c.chemicals.map((ch) => `${ch.name}: ${ch.quantity} ${ch.unit}`).join("; ")}
+                  {c.notes && <span className="text-gray-600"> — {c.notes}</span>}
+                </p>
+                <p className="text-xs text-gray-500 mt-0.5">{formatShortDate(c.timestamp)}</p>
+                <PhotoGrid photos={c.photos ?? []} />
+              </div>
             ))}
-          </ul>
-        </section>
-      )}
+          </div>
+        )}
+      </section>
 
-      {/* Material log */}
-      {data.material.length > 0 && (
-        <section className="border-b border-gray-300 px-6 py-3">
-          <h2 className="text-sm font-semibold uppercase text-gray-600">Material</h2>
-          <ul className="space-y-1 text-sm">
+      {/* 4. Material */}
+      <section className={sectionClass}>
+        <h2 className={sectionTitleClass}>4. Material Log</h2>
+        {data.material.length === 0 ? (
+          <p className="text-gray-500 italic">No material entries for this date.</p>
+        ) : (
+          <div className="space-y-2">
             {data.material.map((m) => (
-              <li key={m.id}>
-                {m.value} {m.unit}
-                {m.notes && ` — ${m.notes}`}
-                <span className="ml-2 text-gray-500">{formatShortDate(m.timestamp)}</span>
-              </li>
+              <div key={m.id} className="bg-gray-50 rounded p-2">
+                <p className="text-gray-900">{m.value} {m.unit}{m.notes ? ` — ${m.notes}` : ""}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{formatShortDate(m.timestamp)}</p>
+                <PhotoGrid photos={m.photos ?? []} />
+              </div>
             ))}
-          </ul>
-        </section>
-      )}
+          </div>
+        )}
+      </section>
 
-      {/* Daily Metrics */}
-      {data.metrics.length > 0 && (
-        <section className="border-b border-gray-300 px-6 py-3">
-          <h2 className="text-sm font-semibold uppercase text-gray-600">Daily Metrics</h2>
-          <ul className="space-y-1 text-sm">
+      {/* 5. Daily Metrics */}
+      <section className={sectionClass}>
+        <h2 className={sectionTitleClass}>5. Daily Metrics</h2>
+        {data.metrics.length === 0 ? (
+          <p className="text-gray-500 italic">No metrics for this date.</p>
+        ) : (
+          <div className="space-y-2">
             {data.metrics.map((m) => (
-              <li key={m.id}>
-                Water: {m.waterUsage ?? "—"} | Acres: {m.acresCompleted ?? "—"} | Operators:{" "}
-                {m.numberOfOperators ?? "—"}
-                {m.notes && ` — ${m.notes}`}
-                <span className="ml-2 text-gray-500">{formatShortDate(m.timestamp)}</span>
-              </li>
+              <div key={m.id} className="bg-gray-50 rounded p-2">
+                <p className="text-gray-900">
+                  Water: {m.waterUsage ?? "—"} | Acres: {m.acresCompleted ?? "—"} | Operators: {m.numberOfOperators ?? "—"}
+                  {m.notes && <span className="text-gray-600"> — {m.notes}</span>}
+                </p>
+                <p className="text-xs text-gray-500 mt-0.5">{formatShortDate(m.timestamp)}</p>
+                <PhotoGrid photos={m.photos ?? []} />
+              </div>
             ))}
-          </ul>
-        </section>
-      )}
+          </div>
+        )}
+      </section>
 
-      {/* Equipment */}
-      {data.equipment.length > 0 && (
-        <section className="border-b border-gray-300 px-6 py-3">
-          <h2 className="text-sm font-semibold uppercase text-gray-600">Equipment</h2>
-          <ul className="space-y-1 text-sm">
+      {/* 6. Equipment */}
+      <section className={sectionClass}>
+        <h2 className={sectionTitleClass}>6. Equipment</h2>
+        {data.equipment.length === 0 ? (
+          <p className="text-gray-500 italic">No equipment entries for this date.</p>
+        ) : (
+          <div className="space-y-2">
             {data.equipment.map((e) => {
               if ("type" in e && (e as EquipmentChecklistEntry).type === "checklist") {
                 const c = e as EquipmentChecklistEntry;
                 return (
-                  <li key={c.id}>
-                    Checklist: Machine #{c.formData.machineNumber} — {c.formData.operatorName} —{" "}
-                    {formatShortDate(c.timestamp)}
-                  </li>
+                  <div key={c.id} className="bg-gray-50 rounded p-2">
+                    <p className="text-gray-900 font-medium">Checklist</p>
+                    <p className="text-gray-700 text-xs mt-0.5">
+                      Machine #{c.formData.machineNumber} | Operator: {c.formData.operatorName} | Site: {c.formData.siteName || "—"}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">{formatShortDate(c.timestamp)}</p>
+                    {c.signature && (
+                      <div className="mt-2">
+                        <p className="text-xs text-gray-500 mb-0.5">Signature:</p>
+                        <img src={c.signature} alt="Checklist signature" className="max-w-[200px] h-12 object-contain border border-gray-200 rounded" />
+                      </div>
+                    )}
+                    <PhotoGrid photos={c.photos ?? []} />
+                  </div>
                 );
               }
               const eq = e as EquipmentEntry;
               return (
-                <li key={eq.id}>
-                  {eq.value && `${eq.value} ${eq.unit || ""}`}
-                  {eq.notes && ` — ${eq.notes}`}
-                  <span className="ml-2 text-gray-500">{formatShortDate(eq.timestamp)}</span>
-                </li>
+                <div key={eq.id} className="bg-gray-50 rounded p-2">
+                  <p className="text-gray-900">{eq.value && `${eq.value} ${eq.unit || ""}`}{eq.notes && ` — ${eq.notes}`}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{formatShortDate(eq.timestamp)}</p>
+                  <PhotoGrid photos={eq.photos ?? []} />
+                </div>
               );
             })}
-          </ul>
-        </section>
-      )}
+          </div>
+        )}
+      </section>
 
-      {/* Survey */}
-      <section className="border-b border-gray-300 px-6 py-3">
-        <h2 className="text-sm font-semibold uppercase text-gray-600">Survey</h2>
+      {/* 7. Survey */}
+      <section className={sectionClass}>
+        <h2 className={sectionTitleClass}>7. Survey</h2>
         {!latestSurvey ? (
-          <p className="text-sm text-gray-500 italic">No survey for this date.</p>
+          <p className="text-gray-500 italic">No survey for this date.</p>
         ) : (
-          <>
-            <div className="overflow-x-auto">
+          <div>
+            <div className="overflow-x-auto rounded border border-gray-200">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="border-b border-gray-300">
-                    <th className="text-left py-1 font-semibold">Questions</th>
-                    <th className="text-left py-1 font-semibold w-16">N/A</th>
-                    <th className="text-left py-1 font-semibold w-16">No</th>
-                    <th className="text-left py-1 font-semibold w-16">Yes</th>
-                    <th className="text-left py-1 font-semibold">Description</th>
+                  <tr className="bg-gray-50">
+                    <th className="text-left py-2 px-2 font-semibold text-gray-700 border-b border-gray-200">Question</th>
+                    <th className="text-center py-2 px-2 font-semibold text-gray-700 border-b border-gray-200 w-12">N/A</th>
+                    <th className="text-center py-2 px-2 font-semibold text-gray-700 border-b border-gray-200 w-12">No</th>
+                    <th className="text-center py-2 px-2 font-semibold text-gray-700 border-b border-gray-200 w-12">Yes</th>
+                    <th className="text-left py-2 px-2 font-semibold text-gray-700 border-b border-gray-200">Description</th>
                   </tr>
                 </thead>
                 <tbody>
                   {latestSurvey.questions.map((q) => (
-                    <tr key={q.id} className="border-b border-gray-200">
-                      <td className="py-1">{q.question}</td>
-                      <td className="py-1">{q.answer === "N/A" ? "✓" : ""}</td>
-                      <td className="py-1">{q.answer === "No" ? "✓" : ""}</td>
-                      <td className="py-1">{q.answer === "Yes" ? "✓" : ""}</td>
-                      <td className="py-1 text-gray-600">{q.description || "—"}</td>
+                    <tr key={q.id} className="border-b border-gray-100">
+                      <td className="py-1.5 px-2 text-gray-900">{q.question}</td>
+                      <td className="py-1.5 px-2 text-center">{q.answer === "N/A" ? "✓" : ""}</td>
+                      <td className="py-1.5 px-2 text-center">{q.answer === "No" ? "✓" : ""}</td>
+                      <td className="py-1.5 px-2 text-center">{q.answer === "Yes" ? "✓" : ""}</td>
+                      <td className="py-1.5 px-2 text-gray-600">{q.description || "—"}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <p className="mt-1 text-gray-500 text-xs">
-              {preparedBy} | {formatShortDate(latestSurvey.timestamp)}
-            </p>
-          </>
+            <p className="text-xs text-gray-500 mt-1">{preparedBy} | {formatShortDate(latestSurvey.timestamp)}</p>
+          </div>
         )}
       </section>
 
-      {/* Attachments */}
-      {data.attachments.length > 0 && (
-        <section className="border-b border-gray-300 px-6 py-3">
-          <h2 className="text-sm font-semibold uppercase text-gray-600">Attachments</h2>
-          <ul className="space-y-1 text-sm">
+      {/* 8. Attachments & Photos */}
+      <section className={sectionClass}>
+        <h2 className={sectionTitleClass}>8. Attachments &amp; Photos</h2>
+        {data.attachments.length === 0 ? (
+          <p className="text-gray-500 italic">No attachments for this date.</p>
+        ) : (
+          <div className="space-y-3">
             {data.attachments.map((a) => (
-              <li key={a.id}>
-                {a.fileNames.join(", ")}
-                {a.notes && ` — ${a.notes}`}
-                <span className="ml-2 text-gray-500">{formatShortDate(a.timestamp)}</span>
-              </li>
+              <div key={a.id} className="bg-gray-50 rounded p-3">
+                <p className="font-medium text-gray-900">Files: {a.fileNames.join(", ")}</p>
+                {a.notes && <p className="text-gray-600 text-xs mt-0.5">{a.notes}</p>}
+                <p className="text-xs text-gray-500 mt-0.5">{formatShortDate(a.timestamp)}</p>
+                {a.previews && a.previews.length > 0 && (
+                  <PhotoGrid photos={a.previews} label="Photos" />
+                )}
+              </div>
             ))}
-          </ul>
-        </section>
-      )}
+          </div>
+        )}
+      </section>
 
-      {/* Signature block */}
+      {/* Signature */}
       {showSignatureBlock && (
-        <section className="border-b border-gray-300 px-6 py-4">
-          <h2 className="text-sm font-semibold uppercase text-gray-600 mb-2">Signature</h2>
+        <section className={`${sectionClass} bg-gray-50`}>
+          <h2 className={sectionTitleClass}>Signature</h2>
           {signatureDataUrl ? (
             <div>
-              <p className="text-sm mb-2">
+              <p className="text-gray-900 mb-2">
                 I, {data.signed?.preparedBy ?? preparedBy}, have reviewed and completed this report.
               </p>
               <img
                 src={signatureDataUrl}
                 alt="Signature"
-                className="max-w-[280px] h-16 object-contain border-b border-black"
+                className="max-w-[280px] h-16 object-contain border-b-2 border-gray-800"
               />
-              {signedAt && (
-                <p className="text-xs text-gray-500 mt-1">{formatShortDate(signedAt)}</p>
-              )}
+              {signedAt && <p className="text-xs text-gray-500 mt-1">{formatShortDate(signedAt)}</p>}
             </div>
           ) : (
-            <p className="text-sm text-gray-500 italic">Not yet signed.</p>
+            <p className="text-gray-500 italic">Not yet signed.</p>
           )}
         </section>
       )}
 
       {/* Footer */}
-      <footer className="px-6 py-4 text-center text-sm text-gray-500">
+      <footer className="px-6 py-4 text-center text-sm text-gray-500 border-t border-gray-200 bg-gray-50">
         Powered by Utility Vision
       </footer>
     </div>
