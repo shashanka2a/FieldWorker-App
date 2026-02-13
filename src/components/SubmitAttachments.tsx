@@ -102,9 +102,6 @@ export function SubmitAttachments() {
           </button>
           <h1 className="text-white text-xl font-bold flex-1">Add Attachments</h1>
         </div>
-        <p className="text-[#0A84FF] text-sm font-medium pt-1" aria-live="polite">
-          Reporting for: {formatReportDateLabel(getReportDate())}
-        </p>
       </header>
 
       {/* Content */}
@@ -190,6 +187,10 @@ export function SubmitAttachments() {
             className="w-full bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl px-4 py-3 text-white placeholder-[#98989D] focus:outline-none focus:ring-2 focus:ring-[#8E8E93] min-h-[100px]"
           />
         </div>
+
+        <p className="text-[#0A84FF] text-sm font-medium mb-2 text-center" aria-live="polite">
+          Reporting for: {formatReportDateLabel(getReportDate())}
+        </p>
 
         {/* Submit Button */}
         <button

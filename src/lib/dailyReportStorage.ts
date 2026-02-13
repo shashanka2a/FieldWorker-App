@@ -16,12 +16,8 @@ export function getReportDate(): Date {
   return new Date();
 }
 
-/** Formatted for UI: "Wed, Feb 12, 2026" or "Today" when same calendar day as today */
+/** Formatted for UI: "Wed, Feb 12, 2026" (always the actual date for consistency) */
 export function formatReportDateLabel(date: Date): string {
-  const today = new Date();
-  if (date.toDateString() === today.toDateString()) {
-    return "Today";
-  }
   return date.toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",

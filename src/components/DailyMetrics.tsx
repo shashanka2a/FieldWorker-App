@@ -107,9 +107,6 @@ export function DailyMetrics() {
             Daily Metrics
           </h2>
         </div>
-        <p className="text-[#0A84FF] text-sm font-medium -mt-2 pb-2" aria-live="polite">
-          Reporting for: {formatReportDateLabel(getReportDate())}
-        </p>
       </header>
 
       {/* Form */}
@@ -260,6 +257,9 @@ export function DailyMetrics() {
 
       {/* Fixed Bottom Submit Button */}
       <div className="fixed bottom-0 left-0 right-0 bg-[#1C1C1E] border-t border-[#3A3A3C] p-4 pb-8">
+        <p className="text-[#0A84FF] text-sm font-medium mb-2 text-center" aria-live="polite">
+          Reporting for: {formatReportDateLabel(getReportDate())}
+        </p>
         <button
           type="submit"
           onClick={handleSubmit}
