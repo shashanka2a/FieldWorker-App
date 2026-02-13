@@ -31,7 +31,19 @@ export function Home() {
   const attachmentInputRef = useRef<HTMLInputElement>(null);
   const calendarScrollRef = useRef<HTMLDivElement>(null);
 
-  // Keep selected date in sync with localStorage when returning from forms or other tabs
+  // Keep selected date in sync with localStorage; persist initial date so report and forms use same key
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = localStorage.getItem("selectedDate");
+    if (saved) {
+      const parsed = new Date(saved);
+      setSelectedDate((prev) => (prev.getTime() === parsed.getTime() ? prev : parsed));
+    } else {
+      const now = new Date();
+      localStorage.setItem("selectedDate", now.toISOString());
+    }
+  }, []);
+
   useEffect(() => {
     const syncFromStorage = () => {
       if (typeof window === "undefined") return;
@@ -41,7 +53,6 @@ export function Home() {
         setSelectedDate((prev) => (prev.getTime() === parsed.getTime() ? prev : parsed));
       }
     };
-    syncFromStorage();
     window.addEventListener("visibilitychange", syncFromStorage);
     return () => window.removeEventListener("visibilitychange", syncFromStorage);
   }, []);

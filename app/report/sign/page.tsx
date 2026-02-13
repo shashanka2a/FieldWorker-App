@@ -38,8 +38,7 @@ function ReportSignContent() {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (!mounted) return;
+  const loadReport = useCallback(() => {
     const date =
       reportDate ??
       (() => {
@@ -53,7 +52,21 @@ function ReportSignContent() {
       setSignatureDataUrl(existing.signatureDataUrl);
       setSubmitted(true);
     }
-  }, [mounted, reportDate]);
+  }, [reportDate]);
+
+  useEffect(() => {
+    if (!mounted) return;
+    loadReport();
+  }, [mounted, loadReport]);
+
+  useEffect(() => {
+    if (!mounted) return;
+    const onVisibilityChange = () => {
+      if (typeof document !== "undefined" && document.visibilityState === "visible") loadReport();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, [mounted, loadReport]);
 
   const startDrawing = useCallback((e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     setIsDrawing(true);
