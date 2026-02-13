@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { FileText, ClipboardList, Droplet, BarChart3, Wrench, Camera, ChevronDown, ChevronLeft, ChevronRight, Calendar, Eye, PenTool } from 'lucide-react';
 import { BottomNav } from './BottomNav';
 import { Spinner } from './ui/spinner';
-import { getDateKey } from '@/lib/dailyReportStorage';
+import { getDateKey, getSignedReport } from '@/lib/dailyReportStorage';
 
 export function Home() {
   const router = useRouter();
@@ -193,6 +193,7 @@ export function Home() {
   const reportDateParam = getDateKey(selectedDate);
   const reportPreviewUrl = `/report/preview?date=${reportDateParam}`;
   const reportSignUrl = `/report/sign?date=${reportDateParam}`;
+  const isSignedForSelectedDate = typeof window !== "undefined" && !!getSignedReport(reportDateParam);
 
   const handleAttachmentClick = () => {
     attachmentInputRef.current?.click();
@@ -482,11 +483,15 @@ export function Home() {
           Preview Report
         </button>
         <button
-          onClick={() => router.push(reportSignUrl)}
-          className="flex-1 bg-[#FF6633] text-white py-4 rounded-xl font-semibold text-base active:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          onClick={() => router.push(isSignedForSelectedDate ? reportPreviewUrl : reportSignUrl)}
+          className={`flex-1 py-4 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-colors ${
+            isSignedForSelectedDate
+              ? "bg-transparent border-2 border-[#34C759] text-[#34C759] active:bg-[#34C759]/10"
+              : "bg-[#FF6633] text-white active:opacity-90"
+          }`}
         >
           <PenTool className="w-5 h-5" />
-          Sign & Submit
+          {isSignedForSelectedDate ? "Signed ✓" : "Sign & Submit"}
         </button>
       </div>
 

@@ -192,9 +192,29 @@ export function saveEquipmentChecklist(dateKey: string, entry: EquipmentChecklis
   appendEntry(STORAGE_KEYS.equipment, dateKey, entry as unknown as EquipmentEntry);
 }
 
+const SIGNED_REPORT_DATE_KEYS = "signed_report_date_keys";
+
 export function saveSignedReport(dateKey: string, entry: SignedReportEntry): void {
   if (typeof window === "undefined") return;
   localStorage.setItem(STORAGE_KEYS.signed(dateKey), JSON.stringify(entry));
+  const keys = getSignedReportDateKeys();
+  if (!keys.includes(dateKey)) {
+    keys.push(dateKey);
+    keys.sort().reverse();
+    localStorage.setItem(SIGNED_REPORT_DATE_KEYS, JSON.stringify(keys));
+  }
+}
+
+export function getSignedReportDateKeys(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(SIGNED_REPORT_DATE_KEYS);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
 }
 
 export function getSignedReport(dateKey: string): SignedReportEntry | null {

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, Paperclip, Plus, FileText, Image as ImageIcon } from 'lucide-react';
 import { BottomNav } from './BottomNav';
-import { getReportDate, getReportForDate } from '@/lib/dailyReportStorage';
+import { getReportDate, getReportForDate, formatReportDateLabel } from '@/lib/dailyReportStorage';
 import type { AttachmentEntry } from '@/lib/dailyReportStorage';
 
 interface Attachment {

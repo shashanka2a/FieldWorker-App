@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, Search, SlidersHorizontal, MapPin, Info, X } from 'lucide-react';
 import { BottomNav } from './BottomNav';
 import { useRouter } from 'next/navigation';
 import { Spinner } from './ui/spinner';
+import { getReportForDate, getDateKey } from '@/lib/dailyReportStorage';
 
 interface PhotoGroup {
   date: string;
@@ -21,157 +22,117 @@ interface Photo {
   operator?: string;
 }
 
+function formatPhotoTime(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+}
+
+function loadPhotoGroupsFromStorage(): PhotoGroup[] {
+  if (typeof window === "undefined") return [];
+  const result: PhotoGroup[] = [];
+  const today = new Date();
+
+  for (let i = 0; i < 60; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const dateKey = getDateKey(d);
+    const report = getReportForDate(d);
+
+    const dateLabel = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+    const photos: Photo[] = [];
+    let idx = 0;
+
+    report.notes.forEach((n) => {
+      (n.photos ?? []).forEach((src) => {
+        photos.push({
+          id: `n-${dateKey}-${idx++}`,
+          url: src,
+          timestamp: formatPhotoTime(n.timestamp),
+          project: n.project?.name,
+        });
+      });
+    });
+    report.attachments.forEach((a) => {
+      (a.previews ?? []).forEach((src) => {
+        photos.push({
+          id: `a-${dateKey}-${idx++}`,
+          url: src,
+          timestamp: formatPhotoTime(a.timestamp),
+          project: a.project?.name,
+        });
+      });
+    });
+    report.chemicals.forEach((c) => {
+      (c.photos ?? []).forEach((src) => {
+        photos.push({
+          id: `c-${dateKey}-${idx++}`,
+          url: src,
+          timestamp: formatPhotoTime(c.timestamp),
+          project: c.project?.name,
+        });
+      });
+    });
+    report.metrics.forEach((m) => {
+      (m.photos ?? []).forEach((src) => {
+        photos.push({
+          id: `m-${dateKey}-${idx++}`,
+          url: src,
+          timestamp: formatPhotoTime(m.timestamp),
+          project: m.project?.name,
+        });
+      });
+    });
+    report.equipment.forEach((e) => {
+      const ph = "photos" in e ? (e.photos ?? []) : [];
+      const ts = "timestamp" in e ? e.timestamp : "";
+      ph.forEach((src) => {
+        photos.push({
+          id: `e-${dateKey}-${idx++}`,
+          url: src,
+          timestamp: ts ? formatPhotoTime(ts) : undefined,
+          project: "project" in e ? (e.project?.name) : undefined,
+        });
+      });
+    });
+
+    if (photos.length > 0) result.push({ date: dateLabel, photos });
+  }
+
+  return result;
+}
+
 export function Gallery() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'all' | 'favorites'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [navigating, setNavigating] = useState(false);
+  const [photoGroups, setPhotoGroups] = useState<PhotoGroup[]>([]);
 
-  // Mock photo data
-  const photoGroups: PhotoGroup[] = [
-    {
-      date: 'March 26, 2025',
-      photos: [
-        { 
-          id: '1', 
-          url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400', 
-          hasLocation: true,
-          location: 'North Valley Solar Farm',
-          timestamp: '2:45 PM',
-          project: 'North Valley Solar Farm',
-          operator: 'Ricky Smith'
-        },
-        { 
-          id: '2', 
-          url: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=400', 
-          hasLocation: true,
-          location: 'North Valley Solar Farm',
-          timestamp: '3:12 PM',
-          project: 'North Valley Solar Farm',
-          operator: 'Ricky Smith'
-        },
-        { 
-          id: '3', 
-          url: 'https://images.unsplash.com/photo-1473186578172-c141e6798cf4?w=400', 
-          hasLocation: true,
-          location: 'North Valley Solar Farm',
-          timestamp: '4:30 PM',
-          project: 'North Valley Solar Farm',
-          operator: 'Ricky Smith'
-        },
-      ]
-    },
-    {
-      date: 'March 25, 2025',
-      photos: [
-        { 
-          id: '4', 
-          url: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=400',
-          timestamp: '9:15 AM',
-          project: 'North Valley Solar Farm',
-          operator: 'Ricky Smith'
-        },
-        { 
-          id: '5', 
-          url: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=400', 
-          hasLocation: true,
-          location: 'North Valley Solar Farm',
-          timestamp: '10:22 AM',
-          project: 'North Valley Solar Farm',
-          operator: 'Ricky Smith'
-        },
-        { 
-          id: '6', 
-          url: 'https://images.unsplash.com/photo-1581092918484-8313e1f7e8cc?w=400',
-          timestamp: '11:45 AM',
-          project: 'North Valley Solar Farm',
-          operator: 'Ricky Smith'
-        },
-        { 
-          id: '7', 
-          url: 'https://images.unsplash.com/photo-1581092918484-8313e1f7e8cc?w=400', 
-          hasLocation: true,
-          location: 'North Valley Solar Farm',
-          timestamp: '1:30 PM',
-          project: 'North Valley Solar Farm',
-          operator: 'Ricky Smith'
-        },
-        { 
-          id: '8', 
-          url: 'https://images.unsplash.com/photo-1581092162384-8987c1d64718?w=400',
-          timestamp: '2:15 PM',
-          project: 'North Valley Solar Farm',
-          operator: 'Ricky Smith'
-        },
-        { 
-          id: '9', 
-          url: 'https://images.unsplash.com/photo-1581092162384-8987c1d64718?w=400',
-          timestamp: '3:00 PM',
-          project: 'North Valley Solar Farm',
-          operator: 'Ricky Smith'
-        },
-        { 
-          id: '10', 
-          url: 'https://images.unsplash.com/photo-1581092162384-8987c1d64718?w=400', 
-          hasLocation: true,
-          location: 'North Valley Solar Farm',
-          timestamp: '3:45 PM',
-          project: 'North Valley Solar Farm',
-          operator: 'Ricky Smith'
-        },
-        { 
-          id: '11', 
-          url: 'https://images.unsplash.com/photo-1581092162384-8987c1d64718?w=400',
-          timestamp: '4:30 PM',
-          project: 'North Valley Solar Farm',
-          operator: 'Ricky Smith'
-        },
-      ]
-    },
-    {
-      date: 'March 24, 2025',
-      photos: [
-        { 
-          id: '12', 
-          url: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=400', 
-          hasLocation: true,
-          location: 'North Valley Solar Farm',
-          timestamp: '8:30 AM',
-          project: 'North Valley Solar Farm',
-          operator: 'Ricky Smith'
-        },
-        { 
-          id: '13', 
-          url: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=400',
-          timestamp: '10:15 AM',
-          project: 'North Valley Solar Farm',
-          operator: 'Ricky Smith'
-        },
-        { 
-          id: '14', 
-          url: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=400',
-          timestamp: '12:00 PM',
-          project: 'North Valley Solar Farm',
-          operator: 'Ricky Smith'
-        },
-        { 
-          id: '15', 
-          url: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=400',
-          timestamp: '2:30 PM',
-          project: 'North Valley Solar Farm',
-          operator: 'Ricky Smith'
-        },
-        { 
-          id: '16', 
-          url: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=400',
-          timestamp: '4:45 PM',
-          project: 'North Valley Solar Farm',
-          operator: 'Ricky Smith'
-        },
-      ]
-    },
-  ];
+  const loadPhotos = useCallback(() => {
+    setPhotoGroups(loadPhotoGroupsFromStorage());
+  }, []);
+
+  useEffect(() => {
+    loadPhotos();
+  }, [loadPhotos]);
+
+  useEffect(() => {
+    const onFocus = () => loadPhotos();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [loadPhotos]);
+
+  const filteredGroups = searchQuery.trim()
+    ? photoGroups.map((g) => ({
+        ...g,
+        photos: g.photos.filter(
+          (p) =>
+            (p.project?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (p.timestamp?.toLowerCase().includes(searchQuery.toLowerCase()))
+        ),
+      })).filter((g) => g.photos.length > 0)
+    : photoGroups;
 
   return (
     <div className="min-h-screen bg-[#1C1C1E] pb-20">
@@ -243,7 +204,17 @@ export function Gallery() {
 
       {/* Photo Groups */}
       <div className="px-4 pb-6 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 280px)' }}>
-        {photoGroups.map((group) => (
+        {filteredGroups.length === 0 ? (
+          <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl p-8 text-center">
+            <div className="text-white font-semibold mb-2">No photos yet</div>
+            <div className="text-[#98989D] text-sm">
+              {photoGroups.length === 0
+                ? "Add photos in Notes, Attachments, or other report entries to see them here"
+                : "No photos match your search"}
+            </div>
+          </div>
+        ) : (
+        filteredGroups.map((group) => (
           <div key={group.date} className="mb-6">
             <h3 className="text-white text-xl font-bold mb-3">{group.date}</h3>
             <div className="grid grid-cols-2 gap-2">
@@ -271,7 +242,7 @@ export function Gallery() {
               ))}
             </div>
           </div>
-        ))}
+        ))) }
       </div>
 
       {/* Photo Info Modal */}
