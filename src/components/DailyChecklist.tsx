@@ -3,11 +3,14 @@
 import { useState, useRef } from 'react';
 import { ChevronLeft, Camera, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Spinner } from './ui/spinner';
 
 export function DailyChecklist() {
   const router = useRouter();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isSigning, setIsSigning] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [backNavigating, setBackNavigating] = useState(false);
   const [signature, setSignature] = useState<string>('');
   const [photos, setPhotos] = useState<string[]>([]);
   
@@ -74,6 +77,7 @@ export function DailyChecklist() {
   };
 
   const handleSubmit = () => {
+    setIsSubmitting(true);
     console.log('Checklist submitted:', formData);
     router.push('/');
   };
@@ -87,11 +91,12 @@ export function DailyChecklist() {
       <header className="px-4 py-4 mb-6 border-b border-[#3A3A3C] sticky top-0 bg-[#1C1C1E] z-10">
         <div className="flex items-center">
           <button 
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation"
+            onClick={() => { setBackNavigating(true); router.back(); }}
+            disabled={backNavigating}
+            className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation disabled:opacity-70"
             aria-label="Go back"
           >
-            <ChevronLeft className="w-5 h-5" />
+            {backNavigating ? <Spinner size="sm" className="border-[#0A84FF] border-t-transparent" /> : <ChevronLeft className="w-5 h-5" />}
             <span>Back</span>
           </button>
           <h2 className="flex-1 text-center text-white text-base font-semibold pr-16">
@@ -548,9 +553,17 @@ export function DailyChecklist() {
         <button
           type="button"
           onClick={handleSubmit}
-          className="w-full bg-[#FF6633] text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity shadow-lg"
+          disabled={isSubmitting}
+          className="w-full bg-[#FF6633] text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
         >
-          Submit Checklist
+          {isSubmitting ? (
+            <>
+              <Spinner size="md" className="border-white border-t-transparent" />
+              <span>Saving...</span>
+            </>
+          ) : (
+            'Submit Checklist'
+          )}
         </button>
       </div>
     </div>

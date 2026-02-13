@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { ChevronLeft, Camera, X, Upload, Check } from 'lucide-react';
+import { Spinner } from './ui/spinner';
 import { useRouter } from 'next/navigation';
 
 export function Notes() {
@@ -9,6 +10,7 @@ export function Notes() {
   const [photos, setPhotos] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [cancelNavigating, setCancelNavigating] = useState(false);
   
   const currentProject = {
     name: 'North Valley Solar Farm',
@@ -95,11 +97,12 @@ export function Notes() {
       <header className="px-4 py-4 mb-6 border-b border-[#3A3A3C] sticky top-0 bg-[#1C1C1E] z-10">
         <div className="flex items-center justify-between">
           <button 
-            onClick={() => router.push('/')}
-            className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation"
+            onClick={() => { setCancelNavigating(true); router.push('/'); }}
+            disabled={cancelNavigating}
+            className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation disabled:opacity-70"
             aria-label="Cancel and go back"
           >
-            <ChevronLeft className="w-5 h-5" />
+            {cancelNavigating ? <Spinner size="sm" className="border-[#0A84FF] border-t-transparent" /> : <ChevronLeft className="w-5 h-5" />}
             <span>Cancel</span>
           </button>
           <h2 className="absolute left-1/2 -translate-x-1/2 text-white text-base font-semibold">
@@ -226,9 +229,16 @@ export function Notes() {
           type="submit"
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="w-full bg-[#0A84FF] text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity disabled:opacity-50 touch-manipulation shadow-lg"
+          className="w-full bg-[#0A84FF] text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity disabled:opacity-50 touch-manipulation shadow-lg flex items-center justify-center gap-2"
         >
-          {isSubmitting ? 'Submitting...' : 'Submit Note'}
+          {isSubmitting ? (
+            <>
+              <Spinner size="md" className="border-white border-t-transparent" />
+              <span>Submitting...</span>
+            </>
+          ) : (
+            'Submit Note'
+          )}
         </button>
       </div>
     </div>

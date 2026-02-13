@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { ChevronLeft, Camera, X, Check, Upload } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
+import { Spinner } from './ui/spinner';
 
 export function SubmitForm() {
   const router = useRouter();
@@ -12,6 +13,7 @@ export function SubmitForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [cancelNavigating, setCancelNavigating] = useState(false);
   
   // Current project (read-only, pre-filled)
   const currentProject = {
@@ -165,11 +167,12 @@ export function SubmitForm() {
       <header className="px-4 py-4 mb-6 border-b border-[#3A3A3C]">
         <div className="flex items-center justify-between">
           <button 
-            onClick={() => router.push('/')}
-            className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation focus:outline-none focus:ring-2 focus:ring-[#FF6633] rounded-lg px-2 py-1"
+            onClick={() => { setCancelNavigating(true); router.push('/'); }}
+            disabled={cancelNavigating}
+            className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation focus:outline-none focus:ring-2 focus:ring-[#FF6633] rounded-lg px-2 py-1 disabled:opacity-70"
             aria-label="Cancel and go back"
           >
-            <ChevronLeft className="w-5 h-5" />
+            {cancelNavigating ? <Spinner size="sm" className="border-[#0A84FF] border-t-transparent" /> : <ChevronLeft className="w-5 h-5" />}
             <span>Cancel</span>
           </button>
           <h2 className="absolute left-1/2 -translate-x-1/2 text-white text-base font-semibold">
@@ -407,10 +410,17 @@ export function SubmitForm() {
           type="submit"
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="w-full text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity disabled:opacity-50 touch-manipulation focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#1C1C1E] shadow-lg"
+          className="w-full text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity disabled:opacity-50 touch-manipulation focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#1C1C1E] shadow-lg flex items-center justify-center gap-2"
           style={{ backgroundColor: getFormColor(), outlineColor: getFormColor() }}
         >
-          {isSubmitting ? 'Submitting...' : 'Submit'}
+          {isSubmitting ? (
+            <>
+              <Spinner size="md" className="border-white border-t-transparent" />
+              <span>Submitting...</span>
+            </>
+          ) : (
+            'Submit'
+          )}
         </button>
       </div>
     </div>

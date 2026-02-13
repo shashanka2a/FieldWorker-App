@@ -1,11 +1,20 @@
 "use client";
 
+import { useState, useEffect } from 'react';
 import { FileText, Image, Briefcase, Settings, LogOut } from 'lucide-react';
 import { BottomNav } from './BottomNav';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { Spinner } from './ui/spinner';
 
 export function More() {
   const router = useRouter();
+  const pathname = usePathname();
+  const [signingOut, setSigningOut] = useState(false);
+  const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
+
+  useEffect(() => {
+    setNavigatingTo(null);
+  }, [pathname]);
 
   const currentUser = {
     name: 'Ricky Smith',
@@ -49,8 +58,10 @@ export function More() {
   ];
 
   const handleSignOut = () => {
+    setSigningOut(true);
     console.log('Sign out clicked');
-    // Handle sign out logic here
+    // Handle sign out logic here - e.g. await signOut(); router.push('/login');
+    setTimeout(() => setSigningOut(false), 800);
   };
 
   return (
@@ -86,17 +97,26 @@ export function More() {
       <div className="px-4 mb-6 space-y-3">
         {menuItems.map((item) => {
           const Icon = item.icon;
+          const isLoading = navigatingTo === item.route;
           return (
             <button
               key={item.id}
-              onClick={() => router.push(item.route)}
-              className="w-full bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl p-4 flex items-center gap-4 active:bg-[#3A3A3C] transition-colors"
+              onClick={() => {
+                setNavigatingTo(item.route);
+                router.push(item.route);
+              }}
+              disabled={!!navigatingTo}
+              className="w-full bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl p-4 flex items-center gap-4 active:bg-[#3A3A3C] transition-colors disabled:opacity-70"
             >
               <div 
                 className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
                 style={{ backgroundColor: `${item.color}20` }}
               >
-                <Icon className="w-6 h-6" style={{ color: item.color }} aria-hidden="true" />
+                {isLoading ? (
+                  <Spinner size="sm" className="border-t-transparent" style={{ color: item.color }} />
+                ) : (
+                  <Icon className="w-6 h-6" style={{ color: item.color }} aria-hidden="true" />
+                )}
               </div>
               <div className="flex-1 text-left">
                 <div className="text-white font-semibold">{item.name}</div>
@@ -111,13 +131,18 @@ export function More() {
       <div className="px-4 mb-6">
         <button
           onClick={handleSignOut}
-          className="w-full bg-[#2C2C2E] border border-[#FF453A] rounded-2xl p-4 flex items-center gap-4 active:bg-[#3A3A3C] transition-colors"
+          disabled={signingOut}
+          className="w-full bg-[#2C2C2E] border border-[#FF453A] rounded-2xl p-4 flex items-center gap-4 active:bg-[#3A3A3C] transition-colors disabled:opacity-70"
         >
           <div className="w-12 h-12 bg-[#FF453A]/20 rounded-full flex items-center justify-center flex-shrink-0">
-            <LogOut className="w-6 h-6 text-[#FF453A]" aria-hidden="true" />
+            {signingOut ? (
+              <Spinner size="sm" className="border-[#FF453A] border-t-transparent" />
+            ) : (
+              <LogOut className="w-6 h-6 text-[#FF453A]" aria-hidden="true" />
+            )}
           </div>
           <div className="flex-1 text-left">
-            <div className="text-[#FF453A] font-semibold">Sign Out</div>
+            <div className="text-[#FF453A] font-semibold">{signingOut ? 'Signing out...' : 'Sign Out'}</div>
             <div className="text-[#98989D] text-sm">Log out of your account</div>
           </div>
         </button>

@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, Upload, X, FileText, Image as ImageIcon } from 'lucide-react';
 import { BottomNav } from './BottomNav';
+import { Spinner } from './ui/spinner';
 
 interface UploadedFile {
   id: string;
@@ -15,6 +16,7 @@ export function SubmitAttachments() {
   const router = useRouter();
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [notes, setNotes] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,6 +53,7 @@ export function SubmitAttachments() {
   };
 
   const handleSubmit = () => {
+    setIsSubmitting(true);
     console.log('Submitting attachments:', { uploadedFiles, notes });
     router.push('/attachments-list');
   };
@@ -174,10 +177,17 @@ export function SubmitAttachments() {
         {/* Submit Button */}
         <button
           onClick={handleSubmit}
-          disabled={uploadedFiles.length === 0}
-          className="w-full bg-gradient-to-br from-[#8E8E93] to-[#6E6E73] text-white py-4 rounded-xl font-semibold text-base shadow-lg shadow-[#8E8E93]/20 active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={uploadedFiles.length === 0 || isSubmitting}
+          className="w-full bg-gradient-to-br from-[#8E8E93] to-[#6E6E73] text-white py-4 rounded-xl font-semibold text-base shadow-lg shadow-[#8E8E93]/20 active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
-          Submit Attachments
+          {isSubmitting ? (
+            <>
+              <Spinner size="md" className="border-white border-t-transparent" />
+              <span>Submitting...</span>
+            </>
+          ) : (
+            'Submit Attachments'
+          )}
         </button>
       </div>
 

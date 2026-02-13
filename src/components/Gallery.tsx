@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ChevronLeft, Search, SlidersHorizontal, MapPin, Info, X } from 'lucide-react';
 import { BottomNav } from './BottomNav';
 import { useRouter } from 'next/navigation';
+import { Spinner } from './ui/spinner';
 
 interface PhotoGroup {
   date: string;
@@ -25,6 +26,7 @@ export function Gallery() {
   const [activeTab, setActiveTab] = useState<'all' | 'favorites'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const [navigating, setNavigating] = useState(false);
 
   // Mock photo data
   const photoGroups: PhotoGroup[] = [
@@ -180,11 +182,12 @@ export function Gallery() {
       <header className="px-4 py-4 mb-4">
         <div className="flex items-center justify-between mb-4">
           <button 
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation"
+            onClick={() => { setNavigating(true); router.back(); }}
+            disabled={navigating}
+            className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation disabled:opacity-70"
             aria-label="Go back"
           >
-            <ChevronLeft className="w-5 h-5" />
+            {navigating ? <Spinner size="sm" className="border-[#0A84FF] border-t-transparent" /> : <ChevronLeft className="w-5 h-5" />}
             <span>Back</span>
           </button>
           <h2 className="absolute left-1/2 -translate-x-1/2 text-white text-base font-semibold">

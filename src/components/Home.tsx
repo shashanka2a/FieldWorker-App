@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { FileText, ClipboardList, Droplet, BarChart3, Wrench, Camera, ChevronDown, ChevronLeft, ChevronRight, Calendar, Eye, PenTool } from 'lucide-react';
 import { BottomNav } from './BottomNav';
+import { Spinner } from './ui/spinner';
 
 export function Home() {
   const router = useRouter();
@@ -25,6 +26,7 @@ export function Home() {
   });
   
   const [showCalendar, setShowCalendar] = useState(false);
+  const [navigatingToRoute, setNavigatingToRoute] = useState<string | null>(null);
   const attachmentInputRef = useRef<HTMLInputElement>(null);
   const calendarScrollRef = useRef<HTMLDivElement>(null);
 
@@ -405,11 +407,16 @@ export function Home() {
           {primaryTasks.map((task) => {
             const Icon = task.icon;
             const isAttachments = task.id === 'attachments';
+            const isLoading = navigatingToRoute === task.route;
             return (
               <button
                 key={task.id}
-                onClick={() => router.push(task.route)}
-                className={`bg-[#2C2C2E] border rounded-2xl p-5 flex flex-col items-center justify-center gap-3 active:bg-[#3A3A3C] transition-colors touch-manipulation focus:outline-none focus:ring-2 focus:ring-[#FF6633] min-h-[140px] ${
+                onClick={() => {
+                  setNavigatingToRoute(task.route);
+                  router.push(task.route);
+                }}
+                disabled={!!navigatingToRoute}
+                className={`bg-[#2C2C2E] border rounded-2xl p-5 flex flex-col items-center justify-center gap-3 active:bg-[#3A3A3C] transition-colors touch-manipulation focus:outline-none focus:ring-2 focus:ring-[#FF6633] min-h-[140px] disabled:opacity-70 ${
                   isAttachments ? 'border-2 border-[#3A3A3C]' : 'border border-[#3A3A3C]'
                 }`}
                 aria-label={task.name}
@@ -418,7 +425,11 @@ export function Home() {
                   className="w-16 h-16 rounded-full flex items-center justify-center"
                   style={{ backgroundColor: `${task.color}20` }}
                 >
-                  <Icon className="w-8 h-8" style={{ color: task.color }} aria-hidden="true" />
+                  {isLoading ? (
+                    <Spinner size="lg" className="border-current border-t-transparent" style={{ color: task.color }} />
+                  ) : (
+                    <Icon className="w-8 h-8" style={{ color: task.color }} aria-hidden="true" />
+                  )}
                 </div>
                 <div className="text-white font-semibold text-base text-center leading-tight">{task.name}</div>
               </button>

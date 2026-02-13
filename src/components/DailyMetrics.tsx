@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { ChevronLeft, Camera, X, Upload, Check } from 'lucide-react';
+import { Spinner } from './ui/spinner';
 import { useRouter } from 'next/navigation';
 
 export function DailyMetrics() {
@@ -9,6 +10,7 @@ export function DailyMetrics() {
   const [photos, setPhotos] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [backNavigating, setBackNavigating] = useState(false);
   
   const currentProject = {
     name: 'North Valley Solar Farm',
@@ -92,11 +94,12 @@ export function DailyMetrics() {
       <header className="px-4 py-4 mb-6 border-b border-[#3A3A3C] sticky top-0 bg-[#1C1C1E] z-10">
         <div className="flex items-center">
           <button 
-            onClick={() => router.push('/')}
-            className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation"
+            onClick={() => { setBackNavigating(true); router.push('/'); }}
+            disabled={backNavigating}
+            className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation disabled:opacity-70"
             aria-label="Go back"
           >
-            <ChevronLeft className="w-5 h-5" />
+            {backNavigating ? <Spinner size="sm" className="border-[#0A84FF] border-t-transparent" /> : <ChevronLeft className="w-5 h-5" />}
             <span>Back</span>
           </button>
           <h2 className="flex-1 text-center text-white text-base font-semibold pr-16">
@@ -257,9 +260,16 @@ export function DailyMetrics() {
           type="submit"
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="w-full bg-[#34C759] text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity disabled:opacity-50 touch-manipulation shadow-lg"
+          className="w-full bg-[#34C759] text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity disabled:opacity-50 touch-manipulation shadow-lg flex items-center justify-center gap-2"
         >
-          {isSubmitting ? 'Submitting...' : 'Submit Metrics'}
+          {isSubmitting ? (
+            <>
+              <Spinner size="md" className="border-white border-t-transparent" />
+              <span>Submitting...</span>
+            </>
+          ) : (
+            'Submit Metrics'
+          )}
         </button>
       </div>
     </div>

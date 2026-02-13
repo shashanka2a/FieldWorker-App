@@ -1,11 +1,19 @@
 "use client";
 
+import { useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from './BottomNav';
+import { Spinner } from './ui/spinner';
 
 export function Settings() {
   const router = useRouter();
+  const [navigating, setNavigating] = useState(false);
+
+  const handleBack = () => {
+    setNavigating(true);
+    router.back();
+  };
 
   return (
     <div className="min-h-screen bg-[#1C1C1E] pb-20">
@@ -16,11 +24,12 @@ export function Settings() {
       <header className="px-4 py-4 mb-4">
         <div className="flex items-center justify-between mb-4">
           <button 
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation"
+            onClick={handleBack}
+            disabled={navigating}
+            className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation disabled:opacity-70"
             aria-label="Go back"
           >
-            <ChevronLeft className="w-5 h-5" />
+            {navigating ? <Spinner size="sm" className="border-[#0A84FF] border-t-transparent" /> : <ChevronLeft className="w-5 h-5" />}
             <span>Back</span>
           </button>
           <h2 className="absolute left-1/2 -translate-x-1/2 text-white text-base font-semibold">
