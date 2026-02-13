@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ChevronLeft, Upload, X, FileText, Image as ImageIcon } from 'lucide-react';
 import { BottomNav } from './BottomNav';
 import { Spinner } from './ui/spinner';
-import { getReportDate, getDateKey, saveAttachments } from '@/lib/dailyReportStorage';
+import { getReportDate, getDateKey, saveAttachments, formatReportDateLabel } from '@/lib/dailyReportStorage';
 
 interface UploadedFile {
   id: string;
@@ -102,6 +102,9 @@ export function SubmitAttachments() {
           </button>
           <h1 className="text-white text-xl font-bold flex-1">Add Attachments</h1>
         </div>
+        <p className="text-[#0A84FF] text-sm font-medium pt-1" aria-live="polite">
+          Reporting for: {formatReportDateLabel(getReportDate())}
+        </p>
       </header>
 
       {/* Content */}

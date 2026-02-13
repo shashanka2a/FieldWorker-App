@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { ChevronLeft, Camera, X, Check, Upload } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { Spinner } from './ui/spinner';
-import { getReportDate, getDateKey, saveMaterial, saveEquipment } from '@/lib/dailyReportStorage';
+import { getReportDate, getDateKey, saveMaterial, saveEquipment, formatReportDateLabel } from '@/lib/dailyReportStorage';
 
 export function SubmitForm() {
   const router = useRouter();
@@ -176,6 +176,9 @@ export function SubmitForm() {
           </h2>
           <div className="w-20" />
         </div>
+        <p className="text-[#0A84FF] text-sm font-medium -mt-2 pb-2" aria-live="polite">
+          Reporting for: {formatReportDateLabel(getReportDate())}
+        </p>
       </header>
 
       {/* Form */}

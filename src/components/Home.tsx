@@ -30,6 +30,21 @@ export function Home() {
   const attachmentInputRef = useRef<HTMLInputElement>(null);
   const calendarScrollRef = useRef<HTMLDivElement>(null);
 
+  // Keep selected date in sync with localStorage when returning from forms or other tabs
+  useEffect(() => {
+    const syncFromStorage = () => {
+      if (typeof window === "undefined") return;
+      const saved = localStorage.getItem("selectedDate");
+      if (saved) {
+        const parsed = new Date(saved);
+        setSelectedDate((prev) => (prev.getTime() === parsed.getTime() ? prev : parsed));
+      }
+    };
+    syncFromStorage();
+    window.addEventListener("visibilitychange", syncFromStorage);
+    return () => window.removeEventListener("visibilitychange", syncFromStorage);
+  }, []);
+
   const projects = [
     { name: 'North Valley Solar Farm' },
     { name: 'East Ridge Pipeline' },
@@ -273,7 +288,7 @@ export function Home() {
 
       {/* Daily Logs Calendar Section */}
       <div className="px-4 mb-4">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-2">
           <h3 className="text-white text-xl font-bold">Daily logs</h3>
           <button
             onClick={() => setShowCalendar(!showCalendar)}
@@ -283,6 +298,9 @@ export function Home() {
             <Calendar className="w-5 h-5 text-[#0A84FF]" />
           </button>
         </div>
+        <p className="text-[#0A84FF] text-sm font-medium mb-2" aria-live="polite">
+          Reporting for: {selectedDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}
+        </p>
 
         {/* Horizontal Scrollable Calendar */}
         <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl p-3">

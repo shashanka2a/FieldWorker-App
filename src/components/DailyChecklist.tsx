@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { ChevronLeft, Camera, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Spinner } from './ui/spinner';
-import { getReportDate, getDateKey, saveEquipmentChecklist } from '@/lib/dailyReportStorage';
+import { getReportDate, getDateKey, saveEquipmentChecklist, formatReportDateLabel } from '@/lib/dailyReportStorage';
 
 export function DailyChecklist() {
   const router = useRouter();
@@ -113,6 +113,9 @@ export function DailyChecklist() {
             Equipment Checklist
           </h2>
         </div>
+        <p className="text-[#0A84FF] text-sm font-medium -mt-2 pb-2" aria-live="polite">
+          Reporting for: {formatReportDateLabel(getReportDate())}
+        </p>
       </header>
 
       {/* Form */}

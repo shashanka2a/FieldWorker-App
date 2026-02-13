@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { ChevronLeft, Camera, X, Upload, Check } from 'lucide-react';
 import { Spinner } from './ui/spinner';
 import { useRouter } from 'next/navigation';
-import { getReportDate, getDateKey, saveMetrics } from '@/lib/dailyReportStorage';
+import { getReportDate, getDateKey, saveMetrics, formatReportDateLabel } from '@/lib/dailyReportStorage';
 
 export function DailyMetrics() {
   const router = useRouter();
@@ -107,6 +107,9 @@ export function DailyMetrics() {
             Daily Metrics
           </h2>
         </div>
+        <p className="text-[#0A84FF] text-sm font-medium -mt-2 pb-2" aria-live="polite">
+          Reporting for: {formatReportDateLabel(getReportDate())}
+        </p>
       </header>
 
       {/* Form */}

@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { ChevronLeft, Camera, X, Upload, Check } from 'lucide-react';
 import { Spinner } from './ui/spinner';
 import { useRouter } from 'next/navigation';
-import { getReportDate, getDateKey, saveSurvey } from '@/lib/dailyReportStorage';
+import { getReportDate, getDateKey, saveSurvey, formatReportDateLabel } from '@/lib/dailyReportStorage';
 
 interface SurveyQuestion {
   id: number;
@@ -107,6 +107,9 @@ export function Survey() {
             Site Survey
           </h2>
         </div>
+        <p className="text-[#0A84FF] text-sm font-medium -mt-2 pb-2" aria-live="polite">
+          Reporting for: {formatReportDateLabel(getReportDate())}
+        </p>
       </header>
 
       {/* Form */}

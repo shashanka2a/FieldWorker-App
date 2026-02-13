@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, Camera, X, Upload, AlertCircle, Check, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Spinner } from './ui/spinner';
-import { getReportDate, getDateKey, saveChemicals } from '@/lib/dailyReportStorage';
+import { getReportDate, getDateKey, saveChemicals, formatReportDateLabel } from '@/lib/dailyReportStorage';
 
 interface Chemical {
   name: string;
@@ -162,6 +162,9 @@ export function MaterialLog() {
             Chemicals
           </h2>
         </div>
+        <p className="text-[#0A84FF] text-sm font-medium -mt-2 pb-2" aria-live="polite">
+          Reporting for: {formatReportDateLabel(getReportDate())}
+        </p>
       </header>
 
       {/* Form */}
