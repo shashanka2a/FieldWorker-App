@@ -176,7 +176,7 @@ export function SubmitAttachments() {
         )}
 
         {/* Notes */}
-        <div className="mb-6">
+        <div className="mb-32">
           <label className="text-[#98989D] text-sm font-semibold mb-2 block">
             Notes (Optional)
           </label>
@@ -187,16 +187,17 @@ export function SubmitAttachments() {
             className="w-full bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl px-4 py-3 text-white placeholder-[#98989D] focus:outline-none focus:ring-2 focus:ring-[#8E8E93] min-h-[100px]"
           />
         </div>
+      </div>
 
+      {/* Fixed bottom: Reporting for + Submit (like Notes) */}
+      <div className="fixed bottom-0 left-0 right-0 bg-[#1C1C1E] border-t border-[#3A3A3C] p-4 pb-8">
         <p className="text-[#0A84FF] text-sm font-medium mb-2 text-center" aria-live="polite">
           Reporting for: {formatReportDateLabel(getReportDate())}
         </p>
-
-        {/* Submit Button */}
         <button
           onClick={handleSubmit}
           disabled={uploadedFiles.length === 0 || isSubmitting}
-          className="w-full bg-gradient-to-br from-[#8E8E93] to-[#6E6E73] text-white py-4 rounded-xl font-semibold text-base shadow-lg shadow-[#8E8E93]/20 active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full bg-[#8E8E93] text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity disabled:opacity-50 touch-manipulation shadow-lg flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <>

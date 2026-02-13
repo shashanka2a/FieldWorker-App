@@ -172,87 +172,55 @@ export function ReportPreview({
           </div>
         </div>
 
-        {/* --- Daily Metrics + Chemicals (two columns) --- */}
-        <div className="px-7 mt-5 flex gap-5">
-          <div className="flex-1">
-            <div
-              className="py-2 px-4 text-white font-bold text-[15px] uppercase tracking-wide"
-              style={{ backgroundColor: ORANGE, letterSpacing: "0.5px" }}
-            >
-              Daily Metrics
-            </div>
-            <div className="border border-[#ddd] border-t-0 px-4 py-4">
-              {!latestMetrics ? (
-                <p className="text-[13px] text-[#666]">—</p>
-              ) : (
-                <div className="space-y-2 text-[13px]">
-                  <div className="flex justify-between border-b border-[#f5f5f5] pb-1">
-                    <strong>Water Usage (GAL)</strong>
-                    <span>{latestMetrics.waterUsage ?? "—"}</span>
-                  </div>
-                  <div className="flex justify-between border-b border-[#f5f5f5] pb-1">
-                    <strong>Acres Completed</strong>
-                    <span>{latestMetrics.acresCompleted ?? "—"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <strong>Number of Operators</strong>
-                    <span>{latestMetrics.numberOfOperators ?? "—"}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="flex-1">
-            <div
-              className="py-2 px-4 text-white font-bold text-[15px] uppercase tracking-wide"
-              style={{ backgroundColor: ORANGE, letterSpacing: "0.5px" }}
-            >
-              Chemicals Left
-            </div>
-            <div className="border border-[#ddd] border-t-0 px-4 py-4">
-              {!latestChemicals || latestChemicals.chemicals.length === 0 ? (
-                <p className="text-[13px] text-[#666]">—</p>
-              ) : (
-                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[12px]">
-                  {latestChemicals.chemicals.map((ch, i) => (
-                    <div key={i}>
-                      <strong>{ch.name}:</strong> {ch.quantity} {ch.unit}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* --- Materials --- */}
+        {/* --- Daily Metrics --- */}
         <div className="px-7 mt-5">
           <div
             className="py-2 px-4 text-white font-bold text-[15px] uppercase tracking-wide"
             style={{ backgroundColor: ORANGE, letterSpacing: "0.5px" }}
           >
-            Materials
+            Daily Metrics
           </div>
-          <div className="border border-[#ddd] border-t-0 px-7 py-4">
-            {data.material.length === 0 ? (
+          <div className="border border-[#ddd] border-t-0 px-4 py-4">
+            {!latestMetrics ? (
               <p className="text-[13px] text-[#666]">—</p>
             ) : (
-              <table className="w-full border-collapse text-[12px]">
-                <thead>
-                  <tr>
-                    <th className="text-left border-b-2 border-[#ccc] py-2 px-1 text-[#444] font-bold">Material</th>
-                    <th className="text-left border-b-2 border-[#ccc] py-2 px-1 text-[#444] font-bold">Day Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.material.map((m) => (
-                    <tr key={m.id}>
-                      <td className="border-b border-[#eee] py-2.5 px-1">{m.notes || m.value || "—"}</td>
-                      <td className="border-b border-[#eee] py-2.5 px-1">{m.value} {m.unit}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="space-y-2 text-[13px]">
+                <div className="flex justify-between border-b border-[#f5f5f5] pb-1">
+                  <strong>Water Usage (GAL)</strong>
+                  <span>{latestMetrics.waterUsage ?? "—"}</span>
+                </div>
+                <div className="flex justify-between border-b border-[#f5f5f5] pb-1">
+                  <strong>Acres Completed</strong>
+                  <span>{latestMetrics.acresCompleted ?? "—"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <strong>Number of Operators</strong>
+                  <span>{latestMetrics.numberOfOperators ?? "—"}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* --- Chemicals Left (underneath Daily Metrics) --- */}
+        <div className="px-7 mt-5">
+          <div
+            className="py-2 px-4 text-white font-bold text-[15px] uppercase tracking-wide"
+            style={{ backgroundColor: ORANGE, letterSpacing: "0.5px" }}
+          >
+            Chemicals Left
+          </div>
+          <div className="border border-[#ddd] border-t-0 px-4 py-4">
+            {!latestChemicals || latestChemicals.chemicals.length === 0 ? (
+              <p className="text-[13px] text-[#666]">—</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[12px]">
+                {latestChemicals.chemicals.map((ch, i) => (
+                  <div key={i}>
+                    <strong>{ch.name}:</strong> {ch.quantity} {ch.unit}
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </div>

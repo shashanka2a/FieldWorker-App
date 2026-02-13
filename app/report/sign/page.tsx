@@ -68,40 +68,52 @@ function ReportSignContent() {
     return () => document.removeEventListener("visibilitychange", onVisibilityChange);
   }, [mounted, loadReport]);
 
+  const getCanvasCoords = useCallback((e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+    const scaleX = canvas.width / rect.width || 1;
+    const scaleY = canvas.height / rect.height || 1;
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY,
+    };
+  }, []);
+
   const startDrawing = useCallback((e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
     setIsDrawing(true);
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = "touches" in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-    const y = "touches" in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+    const { x, y } = getCanvasCoords(e);
     ctx.beginPath();
     ctx.moveTo(x, y);
-  }, []);
+  }, [getCanvasCoords]);
 
   const draw = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+      e.preventDefault();
       if (!isDrawing) return;
       const canvas = canvasRef.current;
       if (!canvas) return;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
-      const rect = canvas.getBoundingClientRect();
-      const x = "touches" in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-      const y = "touches" in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+      const { x, y } = getCanvasCoords(e);
       ctx.lineTo(x, y);
       ctx.stroke();
-      e.preventDefault();
     },
-    [isDrawing]
+    [isDrawing, getCanvasCoords]
   );
 
-  const stopDrawing = useCallback(() => {
+  const stopDrawing = useCallback((e?: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    if (e) e.preventDefault();
     setIsDrawing(false);
     const canvas = canvasRef.current;
-    if (canvas) {
+    if (canvas && canvas.width > 0 && canvas.height > 0) {
       const dataUrl = canvas.toDataURL("image/png");
       setSignatureDataUrl(dataUrl);
     }
@@ -112,14 +124,14 @@ function ReportSignContent() {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    ctx.scale(dpr, dpr);
+    const w = 400;
+    const h = 128;
+    canvas.width = w;
+    canvas.height = h;
     ctx.strokeStyle = "#000";
     ctx.lineWidth = 2;
     ctx.lineCap = "round";
+    ctx.lineJoin = "round";
   }, [mounted]);
 
   const handleClear = useCallback(() => {
@@ -144,8 +156,9 @@ function ReportSignContent() {
     });
     setIsSubmitting(false);
     setSubmitted(true);
+    loadReport();
     setTimeout(() => router.push("/"), 1500);
-  }, [data, signatureDataUrl, router]);
+  }, [data, signatureDataUrl, router, loadReport]);
 
   const alreadySigned = !!data?.signed;
 
@@ -192,7 +205,9 @@ function ReportSignContent() {
                 <div className="border border-[#3A3A3C] rounded-lg bg-white overflow-hidden touch-none">
                   <canvas
                     ref={canvasRef}
-                    className="w-full h-32 block"
+                    className="w-full h-32 block cursor-crosshair"
+                    width={400}
+                    height={128}
                     onMouseDown={startDrawing}
                     onMouseMove={draw}
                     onMouseUp={stopDrawing}
@@ -200,6 +215,7 @@ function ReportSignContent() {
                     onTouchStart={startDrawing}
                     onTouchMove={draw}
                     onTouchEnd={stopDrawing}
+                    onTouchCancel={stopDrawing}
                     style={{ touchAction: "none" }}
                   />
                 </div>

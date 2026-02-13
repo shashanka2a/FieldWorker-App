@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, Paperclip, Plus, FileText, Image as ImageIcon } from 'lucide-react';
 import { BottomNav } from './BottomNav';
-import { getReportDate, getReportForDate, formatReportDateLabel } from '@/lib/dailyReportStorage';
+import { getReportDate, getReportForDate } from '@/lib/dailyReportStorage';
 import type { AttachmentEntry } from '@/lib/dailyReportStorage';
 
 interface Attachment {
@@ -49,11 +49,8 @@ function loadAttachmentsFromStorage(): Attachment[] {
 export function AttachmentsList() {
   const router = useRouter();
   const [attachments, setAttachments] = useState<Attachment[]>([]);
-  const [reportDateLabel, setReportDateLabel] = useState<string>("");
 
   const refreshAttachments = useCallback(() => {
-    const date = getReportDate();
-    setReportDateLabel(formatReportDateLabel(date));
     setAttachments(loadAttachmentsFromStorage());
   }, []);
 
@@ -96,9 +93,6 @@ export function AttachmentsList() {
           </button>
           <h1 className="text-white text-xl font-bold flex-1">Attachments</h1>
         </div>
-        {reportDateLabel && (
-          <p className="text-[#98989D] text-xs mt-1">For {reportDateLabel}</p>
-        )}
       </header>
 
       {/* Content */}
