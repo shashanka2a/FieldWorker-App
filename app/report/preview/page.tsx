@@ -28,8 +28,7 @@ function ReportPreviewContent() {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (!mounted) return;
+  const loadReport = useCallback(() => {
     const date =
       reportDate ??
       (() => {
@@ -38,7 +37,21 @@ function ReportPreviewContent() {
         return saved ? new Date(saved) : new Date();
       })();
     setData(getReportForDate(date));
-  }, [mounted, reportDate]);
+  }, [reportDate]);
+
+  useEffect(() => {
+    if (!mounted) return;
+    loadReport();
+  }, [mounted, loadReport]);
+
+  useEffect(() => {
+    if (!mounted) return;
+    const onVisibilityChange = () => {
+      if (typeof document !== "undefined" && document.visibilityState === "visible") loadReport();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, [mounted, loadReport]);
 
   const handlePrint = useCallback(() => {
     window.print();

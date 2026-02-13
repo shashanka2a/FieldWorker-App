@@ -71,7 +71,7 @@ export function Notes() {
     setShowSuccess(true);
     
     setTimeout(() => {
-      router.push('/');
+      router.push('/notes-list');
     }, 1200);
   };
 

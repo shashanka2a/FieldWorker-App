@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, Paperclip, Plus, FileText, Image as ImageIcon } from 'lucide-react';
 import { BottomNav } from './BottomNav';
+import { getReportDate, getReportForDate, formatReportDateLabel } from '@/lib/dailyReportStorage';
+import type { AttachmentEntry } from '@/lib/dailyReportStorage';
 
 interface Attachment {
   id: string;
@@ -12,14 +14,58 @@ interface Attachment {
   size: string;
   timestamp: string;
   date: string;
-  url?: string;
+  fileCount: number;
+  preview?: string;
+}
+
+function formatAttachmentTime(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+}
+
+function loadAttachmentsFromStorage(): Attachment[] {
+  const date = getReportDate();
+  const report = getReportForDate(date);
+  return report.attachments
+    .map((entry: AttachmentEntry) => {
+      const hasImages = (entry.previews?.length ?? 0) > 0;
+      const name = entry.fileNames.length === 1
+        ? entry.fileNames[0]
+        : `${entry.fileNames.length} files`;
+      return {
+        id: entry.id,
+        name,
+        type: hasImages ? 'image' as const : 'document' as const,
+        size: entry.fileNames.length > 1 ? `${entry.fileNames.length} files` : '—',
+        date: formatReportDateLabel(new Date(entry.timestamp)),
+        timestamp: formatAttachmentTime(entry.timestamp),
+        fileCount: entry.fileNames.length,
+        preview: entry.previews?.[0],
+      };
+    })
+    .reverse();
 }
 
 export function AttachmentsList() {
   const router = useRouter();
-  const [attachments] = useState<Attachment[]>([
-    // Empty initially - will be populated when user adds attachments
-  ]);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [reportDateLabel, setReportDateLabel] = useState<string>("");
+
+  const refreshAttachments = useCallback(() => {
+    const date = getReportDate();
+    setReportDateLabel(formatReportDateLabel(date));
+    setAttachments(loadAttachmentsFromStorage());
+  }, []);
+
+  useEffect(() => {
+    refreshAttachments();
+  }, [refreshAttachments]);
+
+  useEffect(() => {
+    const onFocus = () => refreshAttachments();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [refreshAttachments]);
 
   const getAttachmentIcon = (type: string) => {
     switch (type) {
@@ -50,6 +96,9 @@ export function AttachmentsList() {
           </button>
           <h1 className="text-white text-xl font-bold flex-1">Attachments</h1>
         </div>
+        {reportDateLabel && (
+          <p className="text-[#98989D] text-xs mt-1">For {reportDateLabel}</p>
+        )}
       </header>
 
       {/* Content */}
@@ -74,15 +123,19 @@ export function AttachmentsList() {
                 className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl p-4"
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#8E8E93]/20 flex items-center justify-center flex-shrink-0">
-                    {getAttachmentIcon(attachment.type)}
+                  <div className="w-10 h-10 rounded-full bg-[#8E8E93]/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    {attachment.preview ? (
+                      <img src={attachment.preview} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      getAttachmentIcon(attachment.type)
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-white text-sm font-medium mb-1 truncate">
                       {attachment.name}
                     </p>
                     <div className="text-[#98989D] text-xs">
-                      {attachment.size} • {attachment.date} • {attachment.timestamp}
+                      {attachment.fileCount > 1 ? `${attachment.fileCount} files • ` : ""}{attachment.date} • {attachment.timestamp}
                     </div>
                   </div>
                 </div>

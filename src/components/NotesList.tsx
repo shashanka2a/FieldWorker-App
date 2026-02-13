@@ -1,22 +1,59 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, FileText, Plus } from 'lucide-react';
 import { BottomNav } from './BottomNav';
+import { getReportDate, getReportForDate, formatReportDateLabel } from '@/lib/dailyReportStorage';
+import type { NoteEntry } from '@/lib/dailyReportStorage';
 
 interface Note {
   id: string;
   content: string;
   timestamp: string;
   date: string;
+  hasPhotos?: boolean;
+}
+
+function formatNoteTime(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+}
+
+function loadNotesFromStorage(): Note[] {
+  const date = getReportDate();
+  const report = getReportForDate(date);
+  return report.notes
+    .map((entry: NoteEntry) => ({
+      id: entry.id,
+      content: entry.notes || "(No content)",
+      date: formatReportDateLabel(new Date(entry.timestamp)),
+      timestamp: formatNoteTime(entry.timestamp),
+      hasPhotos: (entry.photos?.length ?? 0) > 0,
+    }))
+    .reverse();
 }
 
 export function NotesList() {
   const router = useRouter();
-  const [notes] = useState<Note[]>([
-    // Empty initially - will be populated when user adds notes
-  ]);
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [reportDateLabel, setReportDateLabel] = useState<string>("");
+
+  const refreshNotes = useCallback(() => {
+    const date = getReportDate();
+    setReportDateLabel(formatReportDateLabel(date));
+    setNotes(loadNotesFromStorage());
+  }, []);
+
+  useEffect(() => {
+    refreshNotes();
+  }, [refreshNotes]);
+
+  useEffect(() => {
+    const onFocus = () => refreshNotes();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [refreshNotes]);
 
   return (
     <div className="min-h-screen bg-[#1C1C1E] pb-20">
@@ -35,6 +72,9 @@ export function NotesList() {
           </button>
           <h1 className="text-white text-xl font-bold flex-1">Notes</h1>
         </div>
+        {reportDateLabel && (
+          <p className="text-[#98989D] text-xs mt-1">For {reportDateLabel}</p>
+        )}
       </header>
 
       {/* Content */}
@@ -63,11 +103,14 @@ export function NotesList() {
                     <FileText className="w-5 h-5 text-[#0A84FF]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm leading-relaxed mb-2">
+                    <p className="text-white text-sm leading-relaxed mb-2 line-clamp-3">
                       {note.content}
                     </p>
-                    <div className="text-[#98989D] text-xs">
-                      {note.date} • {note.timestamp}
+                    <div className="text-[#98989D] text-xs flex items-center gap-2">
+                      <span>{note.date} • {note.timestamp}</span>
+                      {note.hasPhotos && (
+                        <span className="text-[#0A84FF] text-[10px] font-medium">Photo</span>
+                      )}
                     </div>
                   </div>
                 </div>

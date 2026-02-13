@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { FileText, ClipboardList, Droplet, BarChart3, Wrench, Camera, ChevronDown, ChevronLeft, ChevronRight, Calendar, Eye, PenTool } from 'lucide-react';
 import { BottomNav } from './BottomNav';
 import { Spinner } from './ui/spinner';
+import { getDateKey } from '@/lib/dailyReportStorage';
 
 export function Home() {
   const router = useRouter();
@@ -163,12 +164,12 @@ export function Home() {
     },
   ];
 
-  // Check if any data exists for the selected date
+  // Check if any data exists for the selected date (same key as report storage)
   const hasDataForSelectedDate = () => {
     if (typeof window === 'undefined') return false;
-    const dateKey = selectedDate.toISOString().split('T')[0];
-    const dataTypes = ['notes', 'chemicals', 'metrics', 'survey', 'equipment', 'attachments'];
-    
+    const dateKey = getDateKey(selectedDate);
+    const dataTypes = ['notes', 'chemicals', 'metrics', 'survey', 'equipment', 'attachments', 'material'];
+
     return dataTypes.some(type => {
       const key = `${type}_${dateKey}`;
       const data = localStorage.getItem(key);
@@ -178,7 +179,7 @@ export function Home() {
 
   const hasData = hasDataForSelectedDate();
 
-  const reportDateParam = selectedDate.toISOString().split('T')[0];
+  const reportDateParam = getDateKey(selectedDate);
   const reportPreviewUrl = `/report/preview?date=${reportDateParam}`;
   const reportSignUrl = `/report/sign?date=${reportDateParam}`;
 
