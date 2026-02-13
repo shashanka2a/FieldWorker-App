@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import type { ReportData, EquipmentEntry, EquipmentChecklistEntry } from "@/lib/dailyReportStorage";
+import { UtilityVisionLogo } from "./UtilityVisionLogo";
 
 // PDF style: Thu 05/02/2026
 function formatReportDateHeader(d: Date): string {
@@ -273,7 +274,10 @@ export function ReportPreview({
       {/* Footer - PDF style: "1 of 1 | Project Name" and "Powered by Utility Vision" */}
       <footer className="border-t border-black pt-2 mt-4 text-center text-sm">
         <p>1 of 1 | {projectName}</p>
-        <p className="mt-1">Powered by Utility Vision</p>
+        <p className="mt-1 flex items-center justify-center gap-1.5">
+          <UtilityVisionLogo size={16} className="shrink-0" />
+          Powered by Utility Vision
+        </p>
       </footer>
     </div>
   );
