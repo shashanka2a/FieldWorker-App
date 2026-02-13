@@ -205,16 +205,38 @@ export function saveSignedReport(dateKey: string, entry: SignedReportEntry): voi
   }
 }
 
+const REPORT_SIGNED_PREFIX = "report_signed_";
+
 export function getSignedReportDateKeys(): string[] {
   if (typeof window === "undefined") return [];
+  const fromList: string[] = [];
   try {
     const raw = localStorage.getItem(SIGNED_REPORT_DATE_KEYS);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) fromList.push(...parsed);
+    }
   } catch {
-    return [];
+    // ignore
   }
+  const discovered: string[] = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith(REPORT_SIGNED_PREFIX)) {
+        const dateKey = key.slice(REPORT_SIGNED_PREFIX.length);
+        if (dateKey && /^\d{4}-\d{2}-\d{2}$/.test(dateKey) && !fromList.includes(dateKey))
+          discovered.push(dateKey);
+      }
+    }
+  } catch {
+    // ignore
+  }
+  const merged = [...new Set([...fromList, ...discovered])].sort().reverse();
+  if (discovered.length > 0) {
+    localStorage.setItem(SIGNED_REPORT_DATE_KEYS, JSON.stringify(merged));
+  }
+  return merged;
 }
 
 export function getSignedReport(dateKey: string): SignedReportEntry | null {
