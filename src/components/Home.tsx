@@ -245,7 +245,7 @@ export function Home() {
           <div className="text-[#98989D] text-xs uppercase tracking-wide font-semibold mb-1.5">Current Project</div>
           <button
             onClick={() => setShowProjectSelector(!showProjectSelector)}
-            className="w-full bg-gradient-to-br from-[#E85D2F] to-[#F17A4F] rounded-2xl p-3.5 shadow-lg shadow-[#E85D2F]/20 text-left"
+            className="w-full bg-[#FF6633] rounded-2xl p-3.5 shadow-lg shadow-[#FF6633]/20 text-left"
           >
             <div className="flex items-center justify-between">
               <div>

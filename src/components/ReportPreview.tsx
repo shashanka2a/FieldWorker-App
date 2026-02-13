@@ -4,7 +4,6 @@ import { useMemo } from "react";
 import type { ReportData, EquipmentEntry, EquipmentChecklistEntry } from "@/lib/dailyReportStorage";
 import { UtilityVisionLogo } from "./UtilityVisionLogo";
 
-// PDF style: Thu 05/02/2026
 function formatReportDateHeader(d: Date): string {
   const weekday = d.toLocaleDateString("en-US", { weekday: "short" });
   const dd = String(d.getDate()).padStart(2, "0");
@@ -13,7 +12,6 @@ function formatReportDateHeader(d: Date): string {
   return `${weekday} ${dd}/${mm}/${yyyy}`;
 }
 
-// PDF style: 05/02/26 | 07:02PM
 function formatShortDate(iso: string): string {
   const d = new Date(iso);
   const dd = String(d.getDate()).padStart(2, "0");
@@ -36,11 +34,13 @@ function PhotoGrid({ photos }: { photos: string[] }) {
   return (
     <div className="flex flex-wrap gap-1 mt-1">
       {photos.map((src, i) => (
-        <img key={i} src={src} alt="" className="w-16 h-16 object-cover border border-black/20" />
+        <img key={i} src={src} alt="" className="w-16 h-16 object-cover border border-black" />
       ))}
     </div>
   );
 }
+
+const SECTION_HEADER = "text-xs font-bold uppercase tracking-wide text-white bg-[#FF6633] px-2 py-1.5 border border-black";
 
 export function ReportPreview({
   data,
@@ -55,227 +55,198 @@ export function ReportPreview({
   );
 
   const projectName = data.projectName;
-  const projectAddress = "—"; // From API or project settings when available
-  const jobNumber = "—"; // From API when available
+  const preparedByLabel = data.signed?.preparedBy ?? preparedBy;
 
   return (
-    <div className="bg-white text-black max-w-[210mm] mx-auto min-h-screen print:shadow-none text-sm" style={{ fontFamily: "system-ui, sans-serif" }}>
-      {/* Header - PDF style: project name, address, date + job # */}
-      <header className="border-b border-black pb-2 mb-2">
-        <h1 className="text-base font-bold leading-tight">{projectName}</h1>
-        <p className="text-sm leading-tight">{projectAddress}</p>
-        <p className="text-sm mt-0.5">Date {formatReportDateHeader(data.date)} Job # {jobNumber}</p>
+    <div className="bg-white text-black max-w-[210mm] mx-auto min-h-screen print:shadow-none text-sm border border-black" style={{ fontFamily: "system-ui, sans-serif" }}>
+      {/* Header */}
+      <header className="border-b-4 border-[#FF6633] bg-white px-4 py-3">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h1 className="text-lg font-bold text-black leading-tight">{projectName}</h1>
+            <p className="text-sm text-black/80 mt-0.5">Date: {formatReportDateHeader(data.date)}</p>
+          </div>
+          <UtilityVisionLogo size={32} className="shrink-0" />
+        </div>
       </header>
 
-      {/* Weather - PDF style: 7 AM, 12 PM, 4 PM with temp, condition, wind, precip, humidity */}
-      <section className="mb-3">
-        <h2 className="text-sm font-bold mb-1">Weather</h2>
-        <div className="grid grid-cols-3 gap-2 text-sm">
-          <div>
-            <div className="font-medium">7:00 AM</div>
-            <div>—°</div>
-            <div>—</div>
-            <div>Wind: | | .0&quot; Precipitation: —% Humidity:</div>
-          </div>
-          <div>
-            <div className="font-medium">12:00 PM</div>
-            <div>—°</div>
-            <div>—</div>
-            <div>Wind: | | .0&quot; Precipitation: —% Humidity:</div>
-          </div>
-          <div>
-            <div className="font-medium">4:00 PM</div>
-            <div>—°</div>
-            <div>—</div>
-            <div>Wind: | | .0&quot; Precipitation: —% Humidity:</div>
-          </div>
+      {/* 1. General Notes */}
+      <section className="border-b border-black">
+        <h2 className={SECTION_HEADER}>1. General Notes</h2>
+        <div className="px-3 py-2 bg-white">
+          {data.notes.length === 0 ? (
+            <p className="text-black/70">—</p>
+          ) : (
+            <div className="space-y-2">
+              {data.notes.map((n, i) => (
+                <div key={n.id} className="border-l-2 border-[#FF6633] pl-2">
+                  <p className="text-black">{i + 1}. {n.notes || "(No content)"}</p>
+                  <p className="text-xs text-black/70">{preparedByLabel} | {formatShortDate(n.timestamp)}</p>
+                  <PhotoGrid photos={n.photos ?? []} />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Materials - PDF style table (Material, Cost Code, Day Total, Week Total, Quantities to Date) */}
-      <section className="mb-3">
-        <h2 className="text-sm font-bold mb-1">Materials</h2>
-        <table className="w-full border-collapse border border-black text-sm">
-          <thead>
-            <tr>
-              <th className="border border-black px-2 py-1 text-left font-bold">Material</th>
-              <th className="border border-black px-2 py-1 text-left font-bold">Cost Code</th>
-              <th className="border border-black px-2 py-1 text-left font-bold">Day Total</th>
-              <th className="border border-black px-2 py-1 text-left font-bold">Week Total</th>
-              <th className="border border-black px-2 py-1 text-left font-bold">Quantities to Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.material.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="border border-black px-2 py-1">—</td>
-              </tr>
-            ) : (
-              data.material.map((m) => (
-                <tr key={m.id}>
-                  <td className="border border-black px-2 py-1">{m.notes || m.value || "—"}</td>
-                  <td className="border border-black px-2 py-1">—</td>
-                  <td className="border border-black px-2 py-1">{m.value} {m.unit}</td>
-                  <td className="border border-black px-2 py-1">—</td>
-                  <td className="border border-black px-2 py-1">—</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-        {data.material.length > 0 && (
-          <>
-            <p className="text-sm mt-0.5">{data.signed?.preparedBy ?? preparedBy} | {formatShortDate(data.material[data.material.length - 1].timestamp)}</p>
-            <p className="text-sm mt-0.5">Material Log Photos</p>
-          </>
-        )}
+      {/* 2. Chemicals */}
+      <section className="border-b border-black">
+        <h2 className={SECTION_HEADER}>2. Chemicals</h2>
+        <div className="px-3 py-2 bg-white">
+          {data.chemicals.length === 0 ? (
+            <p className="text-black/70">—</p>
+          ) : (
+            <div className="space-y-2">
+              {data.chemicals.map((c) => (
+                <div key={c.id} className="border-l-2 border-[#FF6633] pl-2">
+                  <p className="text-black">{c.chemicals.map((ch) => `${ch.name}: ${ch.quantity} ${ch.unit}`).join("; ")}{c.notes ? ` — ${c.notes}` : ""}</p>
+                  <p className="text-xs text-black/70">{preparedByLabel} | {formatShortDate(c.timestamp)}</p>
+                  <PhotoGrid photos={c.photos ?? []} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </section>
 
-      {/* General Notes - PDF style: numbered list, Author | date | time under each */}
-      <section className="mb-3">
-        <h2 className="text-sm font-bold mb-1">General Notes</h2>
-        {data.notes.length === 0 ? (
-          <p>—</p>
-        ) : (
-          <div className="space-y-1">
-            {data.notes.map((n, i) => (
-              <div key={n.id}>
-                <p>{i + 1}. {n.notes || "(No content)"}</p>
-                <p className="text-sm">{preparedBy} | {formatShortDate(n.timestamp)}</p>
-                <PhotoGrid photos={n.photos ?? []} />
-              </div>
-            ))}
-          </div>
-        )}
+      {/* 3. Materials */}
+      <section className="border-b border-black">
+        <h2 className={SECTION_HEADER}>3. Materials</h2>
+        <div className="px-3 py-2 bg-white">
+          {data.material.length === 0 ? (
+            <p className="text-black/70">—</p>
+          ) : (
+            <>
+              <table className="w-full border-collapse border border-black text-sm">
+                <thead>
+                  <tr className="bg-black text-white">
+                    <th className="border border-black px-2 py-1 text-left font-bold text-xs">Material</th>
+                    <th className="border border-black px-2 py-1 text-left font-bold text-xs">Day Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.material.map((m) => (
+                    <tr key={m.id}>
+                      <td className="border border-black px-2 py-1 text-black">{m.notes || m.value || "—"}</td>
+                      <td className="border border-black px-2 py-1 text-black">{m.value} {m.unit}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="text-xs text-black/70 mt-1">{preparedByLabel} | {formatShortDate(data.material[data.material.length - 1].timestamp)}</p>
+            </>
+          )}
+        </div>
       </section>
 
-      {/* Chemicals */}
-      {data.chemicals.length > 0 && (
-        <section className="mb-3">
-          <h2 className="text-sm font-bold mb-1">Chemicals</h2>
-          <div className="space-y-1">
-            {data.chemicals.map((c) => (
-              <div key={c.id}>
-                <p>{c.chemicals.map((ch) => `${ch.name}: ${ch.quantity} ${ch.unit}`).join("; ")}{c.notes ? ` — ${c.notes}` : ""}</p>
-                <p className="text-sm">{preparedBy} | {formatShortDate(c.timestamp)}</p>
-                <PhotoGrid photos={c.photos ?? []} />
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* 4. Daily Metrics */}
+      <section className="border-b border-black">
+        <h2 className={SECTION_HEADER}>4. Daily Metrics</h2>
+        <div className="px-3 py-2 bg-white">
+          {data.metrics.length === 0 ? (
+            <p className="text-black/70">—</p>
+          ) : (
+            <div className="space-y-2">
+              {data.metrics.map((m) => (
+                <div key={m.id} className="border-l-2 border-[#FF6633] pl-2">
+                  <p className="text-black">Water: {m.waterUsage ?? "—"} | Acres: {m.acresCompleted ?? "—"} | Operators: {m.numberOfOperators ?? "—"}{m.notes ? ` — ${m.notes}` : ""}</p>
+                  <p className="text-xs text-black/70">{preparedByLabel} | {formatShortDate(m.timestamp)}</p>
+                  <PhotoGrid photos={m.photos ?? []} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
 
-      {/* Daily Metrics */}
-      {data.metrics.length > 0 && (
-        <section className="mb-3">
-          <h2 className="text-sm font-bold mb-1">Daily Metrics</h2>
-          <div className="space-y-1">
-            {data.metrics.map((m) => (
-              <div key={m.id}>
-                <p>Water: {m.waterUsage ?? "—"} | Acres: {m.acresCompleted ?? "—"} | Operators: {m.numberOfOperators ?? "—"}{m.notes ? ` — ${m.notes}` : ""}</p>
-                <p className="text-sm">{preparedBy} | {formatShortDate(m.timestamp)}</p>
-                <PhotoGrid photos={m.photos ?? []} />
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Equipment */}
-      {data.equipment.length > 0 && (
-        <section className="mb-3">
-          <h2 className="text-sm font-bold mb-1">Equipment</h2>
-          <div className="space-y-1">
-            {data.equipment.map((e) => {
-              if ("type" in e && (e as EquipmentChecklistEntry).type === "checklist") {
-                const c = e as EquipmentChecklistEntry;
+      {/* 5. Equipment */}
+      <section className="border-b border-black">
+        <h2 className={SECTION_HEADER}>5. Equipment</h2>
+        <div className="px-3 py-2 bg-white">
+          {data.equipment.length === 0 ? (
+            <p className="text-black/70">—</p>
+          ) : (
+            <div className="space-y-2">
+              {data.equipment.map((e) => {
+                if ("type" in e && (e as EquipmentChecklistEntry).type === "checklist") {
+                  const c = e as EquipmentChecklistEntry;
+                  return (
+                    <div key={c.id} className="border-l-2 border-[#FF6633] pl-2">
+                      <p className="text-black">Checklist: Machine #{c.formData.machineNumber} — {c.formData.operatorName}</p>
+                      <p className="text-xs text-black/70">{formatShortDate(c.timestamp)}</p>
+                      {c.signature && <img src={c.signature} alt="Signature" className="max-w-[200px] h-10 object-contain border-b-2 border-black mt-0.5" />}
+                      <PhotoGrid photos={c.photos ?? []} />
+                    </div>
+                  );
+                }
+                const eq = e as EquipmentEntry;
                 return (
-                  <div key={c.id}>
-                    <p>Checklist: Machine #{c.formData.machineNumber} — {c.formData.operatorName}</p>
-                    <p className="text-sm">{formatShortDate(c.timestamp)}</p>
-                    {c.signature && <img src={c.signature} alt="Signature" className="max-w-[200px] h-10 object-contain border-b border-black mt-0.5" />}
-                    <PhotoGrid photos={c.photos ?? []} />
+                  <div key={eq.id} className="border-l-2 border-[#FF6633] pl-2">
+                    <p className="text-black">{eq.value} {eq.unit || ""}{eq.notes ? ` — ${eq.notes}` : ""}</p>
+                    <p className="text-xs text-black/70">{formatShortDate(eq.timestamp)}</p>
+                    <PhotoGrid photos={eq.photos ?? []} />
                   </div>
                 );
-              }
-              const eq = e as EquipmentEntry;
-              return (
-                <div key={eq.id}>
-                  <p>{eq.value} {eq.unit || ""}{eq.notes ? ` — ${eq.notes}` : ""}</p>
-                  <p className="text-sm">{formatShortDate(eq.timestamp)}</p>
-                  <PhotoGrid photos={eq.photos ?? []} />
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* Survey - PDF style table: Questions | N/A | No | Yes | Description */}
-      <section className="mb-3">
-        <h2 className="text-sm font-bold mb-1">Survey</h2>
-        {!latestSurvey ? (
-          <p>—</p>
-        ) : (
-          <>
-            <table className="w-full border-collapse border border-black text-sm">
-              <thead>
-                <tr>
-                  <th className="border border-black px-2 py-1 text-left font-bold">Questions</th>
-                  <th className="border border-black px-2 py-1 text-left font-bold w-12">N/A</th>
-                  <th className="border border-black px-2 py-1 text-left font-bold w-12">No</th>
-                  <th className="border border-black px-2 py-1 text-left font-bold w-12">Yes</th>
-                  <th className="border border-black px-2 py-1 text-left font-bold">Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                {latestSurvey.questions.map((q) => (
-                  <tr key={q.id}>
-                    <td className="border border-black px-2 py-0.5">{q.question}</td>
-                    <td className="border border-black px-2 py-0.5">{q.answer === "N/A" ? "✓" : ""}</td>
-                    <td className="border border-black px-2 py-0.5">{q.answer === "No" ? "✓" : ""}</td>
-                    <td className="border border-black px-2 py-0.5">{q.answer === "Yes" ? "✓" : ""}</td>
-                    <td className="border border-black px-2 py-0.5">{q.description || ""}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <p className="text-sm mt-0.5">{preparedBy} | {formatShortDate(latestSurvey.timestamp)}</p>
-          </>
-        )}
+              })}
+            </div>
+          )}
+        </div>
       </section>
 
-      {/* Attachments & Photos */}
-      {data.attachments.length > 0 && (
-        <section className="mb-3">
-          <h2 className="text-sm font-bold mb-1">Attachments &amp; Photos</h2>
-          <div className="space-y-1">
-            {data.attachments.map((a) => (
-              <div key={a.id}>
-                <p>Files: {a.fileNames.join(", ")}{a.notes ? ` — ${a.notes}` : ""}</p>
-                <p className="text-sm">{formatShortDate(a.timestamp)}</p>
-                {a.previews?.length ? <PhotoGrid photos={a.previews} /> : null}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* 6. Survey */}
+      <section className="border-b border-black">
+        <h2 className={SECTION_HEADER}>6. Survey</h2>
+        <div className="px-3 py-2 bg-white">
+          {!latestSurvey ? (
+            <p className="text-black/70">—</p>
+          ) : (
+            <>
+              <table className="w-full border-collapse border border-black text-sm">
+                <thead>
+                  <tr className="bg-black text-white">
+                    <th className="border border-black px-2 py-1 text-left font-bold text-xs">Question</th>
+                    <th className="border border-black px-2 py-1 text-center font-bold text-xs w-14">N/A</th>
+                    <th className="border border-black px-2 py-1 text-center font-bold text-xs w-14">No</th>
+                    <th className="border border-black px-2 py-1 text-center font-bold text-xs w-14">Yes</th>
+                    <th className="border border-black px-2 py-1 text-left font-bold text-xs">Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {latestSurvey.questions.map((q) => (
+                    <tr key={q.id}>
+                      <td className="border border-black px-2 py-1 text-black">{q.question}</td>
+                      <td className="border border-black px-2 py-1 text-center">{q.answer === "N/A" ? "✓" : ""}</td>
+                      <td className="border border-black px-2 py-1 text-center">{q.answer === "No" ? "✓" : ""}</td>
+                      <td className="border border-black px-2 py-1 text-center">{q.answer === "Yes" ? "✓" : ""}</td>
+                      <td className="border border-black px-2 py-1 text-black">{q.description || "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="text-xs text-black/70 mt-1">{preparedByLabel} | {formatShortDate(latestSurvey.timestamp)}</p>
+            </>
+          )}
+        </div>
+      </section>
 
       {/* Signature */}
       {showSignatureBlock && signatureDataUrl && (
-        <section className="mb-3">
-          <h2 className="text-sm font-bold mb-1">Signature</h2>
-          <p className="text-sm mb-0.5">I, {data.signed?.preparedBy ?? preparedBy}, have reviewed and completed this report.</p>
-          <img src={signatureDataUrl} alt="Signature" className="max-w-[280px] h-14 object-contain border-b border-black" />
-          {signedAt && <p className="text-sm mt-0.5">{data.signed?.preparedBy ?? preparedBy} | {formatShortDate(signedAt)}</p>}
+        <section className="border-b border-black">
+          <h2 className={SECTION_HEADER}>Signature</h2>
+          <div className="px-3 py-2 bg-white">
+            <p className="text-sm text-black mb-1">I, {preparedByLabel}, have reviewed and completed this report.</p>
+            <img src={signatureDataUrl} alt="Signature" className="max-w-[280px] h-14 object-contain border-b-2 border-black" />
+            {signedAt && <p className="text-xs text-black/70 mt-1">{preparedByLabel} | {formatShortDate(signedAt)}</p>}
+          </div>
         </section>
       )}
 
-      {/* Footer - PDF style: "1 of 1 | Project Name" and "Powered by Utility Vision" */}
-      <footer className="border-t border-black pt-2 mt-4 text-center text-sm">
-        <p>1 of 1 | {projectName}</p>
-        <p className="mt-1 flex items-center justify-center gap-1.5">
-          <UtilityVisionLogo size={16} className="shrink-0" />
+      {/* Footer */}
+      <footer className="bg-black text-white px-4 py-3 text-center text-sm">
+        <p className="font-medium">{projectName} — {formatReportDateHeader(data.date)}</p>
+        <p className="mt-1.5 flex items-center justify-center gap-2 text-white/90">
+          <UtilityVisionLogo size={14} className="shrink-0 opacity-90" />
           Powered by Utility Vision
         </p>
       </footer>

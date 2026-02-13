@@ -77,7 +77,7 @@ export function More() {
 
       {/* Profile Section */}
       <div className="px-4 mb-6">
-        <div className="bg-gradient-to-br from-[#E85D2F] to-[#F17A4F] rounded-2xl p-6 shadow-lg shadow-[#E85D2F]/20">
+        <div className="bg-[#FF6633] rounded-2xl p-6 shadow-lg shadow-[#FF6633]/20">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
               <span className="text-white text-2xl font-bold">
