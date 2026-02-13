@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ChevronLeft, Upload, X, FileText, Image as ImageIcon } from 'lucide-react';
 import { BottomNav } from './BottomNav';
 import { Spinner } from './ui/spinner';
+import { getReportDate, getDateKey, saveAttachments } from '@/lib/dailyReportStorage';
 
 interface UploadedFile {
   id: string;
@@ -54,7 +55,20 @@ export function SubmitAttachments() {
 
   const handleSubmit = () => {
     setIsSubmitting(true);
-    console.log('Submitting attachments:', { uploadedFiles, notes });
+    const date = getReportDate();
+    const dateKey = getDateKey(date);
+    const fileNames = uploadedFiles.map(f => f.file.name);
+    const previews = uploadedFiles
+      .map(f => f.preview)
+      .filter((p): p is string => !!p);
+    saveAttachments(dateKey, {
+      id: Date.now().toString(),
+      project: { name: 'North Valley Solar Farm' },
+      timestamp: new Date().toISOString(),
+      fileNames,
+      notes,
+      previews: previews.length ? previews : undefined,
+    });
     router.push('/attachments-list');
   };
 

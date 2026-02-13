@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { ChevronLeft, Camera, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Spinner } from './ui/spinner';
+import { getReportDate, getDateKey, saveEquipmentChecklist } from '@/lib/dailyReportStorage';
 
 export function DailyChecklist() {
   const router = useRouter();
@@ -78,7 +79,16 @@ export function DailyChecklist() {
 
   const handleSubmit = () => {
     setIsSubmitting(true);
-    console.log('Checklist submitted:', formData);
+    const date = getReportDate();
+    const dateKey = getDateKey(date);
+    saveEquipmentChecklist(dateKey, {
+      id: Date.now().toString(),
+      type: 'checklist',
+      timestamp: new Date().toISOString(),
+      formData: { ...formData },
+      signature: signature || undefined,
+      photos,
+    });
     router.push('/');
   };
 

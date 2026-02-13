@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { ChevronLeft, Camera, X, Check, Upload } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { Spinner } from './ui/spinner';
+import { getReportDate, getDateKey, saveMaterial, saveEquipment } from '@/lib/dailyReportStorage';
 
 export function SubmitForm() {
   const router = useRouter();
@@ -114,31 +115,26 @@ export function SubmitForm() {
 
     setIsSubmitting(true);
     
-    // Simulate submission - in real app, save to localStorage and sync
-    const submission = {
-      id: Date.now().toString(),
-      type,
-      project: currentProject,
-      timestamp: new Date().toISOString(),
-      value,
-      unit,
-      notes,
-      photos,
-      syncStatus: 'synced', // In real app, would be 'pending' until synced
-    };
+    const date = getReportDate();
+    const dateKey = getDateKey(date);
+    const id = Date.now().toString();
+    const timestamp = new Date().toISOString();
+    const payload = { id, project: currentProject, timestamp, notes, photos };
+
+    if (type === 'material') {
+      saveMaterial(dateKey, { ...payload, value, unit });
+    } else if (type === 'equipment') {
+      saveEquipment(dateKey, { ...payload, value: value || undefined, unit: unit || undefined });
+    }
     
-    console.log('Submission:', submission);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 800));
     
     setIsSubmitting(false);
     setShowSuccess(true);
     
-    // Navigate back after success
     setTimeout(() => {
       router.push('/');
-    }, 1500);
+    }, 1200);
   };
 
   if (showSuccess) {

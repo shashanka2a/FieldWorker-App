@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { ChevronLeft, Camera, X, Upload, Check } from 'lucide-react';
 import { Spinner } from './ui/spinner';
 import { useRouter } from 'next/navigation';
+import { getReportDate, getDateKey, saveNotes } from '@/lib/dailyReportStorage';
 
 export function Notes() {
   const router = useRouter();
@@ -52,6 +53,8 @@ export function Notes() {
     
     setIsSubmitting(true);
     
+    const date = getReportDate();
+    const dateKey = getDateKey(date);
     const submission = {
       id: Date.now().toString(),
       project: currentProject,
@@ -59,19 +62,17 @@ export function Notes() {
       category,
       notes,
       photos,
-      syncStatus: 'synced',
     };
+    saveNotes(dateKey, submission);
     
-    console.log('Notes Submission:', submission);
-    
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 800));
     
     setIsSubmitting(false);
     setShowSuccess(true);
     
     setTimeout(() => {
       router.push('/');
-    }, 1500);
+    }, 1200);
   };
 
   if (showSuccess) {

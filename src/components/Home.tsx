@@ -163,6 +163,10 @@ export function Home() {
 
   const hasData = hasDataForSelectedDate();
 
+  const reportDateParam = selectedDate.toISOString().split('T')[0];
+  const reportPreviewUrl = `/report/preview?date=${reportDateParam}`;
+  const reportSignUrl = `/report/sign?date=${reportDateParam}`;
+
   const handleAttachmentClick = () => {
     attachmentInputRef.current?.click();
   };
@@ -441,14 +445,14 @@ export function Home() {
       {/* Report CTAs */}
       <div className="px-4 mb-4 mt-6 flex gap-3">
         <button
-          onClick={() => console.log('Preview report for date:', selectedDate)}
+          onClick={() => router.push(reportPreviewUrl)}
           className="flex-1 bg-transparent border-2 border-[#FF6633] text-[#FF6633] py-4 rounded-xl font-semibold text-base active:bg-[#FF6633]/10 transition-colors flex items-center justify-center gap-2"
         >
           <Eye className="w-5 h-5" />
           Preview Report
         </button>
         <button
-          onClick={() => console.log('Sign & submit report for date:', selectedDate)}
+          onClick={() => router.push(reportSignUrl)}
           className="flex-1 bg-[#FF6633] text-white py-4 rounded-xl font-semibold text-base active:opacity-90 transition-opacity flex items-center justify-center gap-2"
         >
           <PenTool className="w-5 h-5" />

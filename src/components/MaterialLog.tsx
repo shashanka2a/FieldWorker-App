@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, Camera, X, Upload, AlertCircle, Check, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Spinner } from './ui/spinner';
+import { getReportDate, getDateKey, saveChemicals } from '@/lib/dailyReportStorage';
 
 interface Chemical {
   name: string;
@@ -103,9 +104,9 @@ export function MaterialLog() {
     
     setIsSubmitting(true);
     
-    // Only include chemicals with quantities
     const usedChemicals = chemicals.filter(c => c.quantity && parseFloat(c.quantity) > 0);
-    
+    const date = getReportDate();
+    const dateKey = getDateKey(date);
     const submission = {
       id: Date.now().toString(),
       project: currentProject,
@@ -113,19 +114,17 @@ export function MaterialLog() {
       chemicals: usedChemicals,
       notes,
       photos,
-      syncStatus: 'synced',
     };
+    saveChemicals(dateKey, submission);
     
-    console.log('Chemical Usage Submission:', submission);
-    
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 800));
     
     setIsSubmitting(false);
     setShowSuccess(true);
     
     setTimeout(() => {
       router.push('/');
-    }, 1500);
+    }, 1200);
   };
 
   if (showSuccess) {
