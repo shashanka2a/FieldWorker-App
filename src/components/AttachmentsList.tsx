@@ -78,20 +78,17 @@ export function AttachmentsList() {
 
   return (
     <div className="min-h-screen bg-[#1C1C1E] pb-20">
-      {/* Status Bar Spacer */}
-      <div className="h-12" />
-
       {/* Header */}
-      <header className="bg-[#2C2C2E] border-b border-[#3A3A3C] px-4 py-3 sticky top-12 z-20">
+      <header className="bg-[#2C2C2E] border-b border-[#3A3A3C] px-4 py-4 sticky top-0 z-20">
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push('/')}
             className="w-10 h-10 flex items-center justify-center active:bg-[#3A3A3C] rounded-lg transition-colors"
             aria-label="Go back"
           >
-            <ChevronLeft className="w-6 h-6 text-[#0A84FF]" />
+            <ChevronLeft className="w-6 h-6 text-[#FF6633]" />
           </button>
-          <h1 className="text-white text-xl font-bold flex-1">Attachments</h1>
+          <h1 className="text-white text-xl font-bold flex-1">Photos</h1>
         </div>
       </header>
 
@@ -100,12 +97,12 @@ export function AttachmentsList() {
         {attachments.length === 0 ? (
           // Empty State
           <div className="flex flex-col items-center justify-center py-20 px-4">
-            <div className="w-20 h-20 rounded-full bg-[#8E8E93]/20 flex items-center justify-center mb-4">
-              <Paperclip className="w-10 h-10 text-[#8E8E93]" />
+            <div className="w-20 h-20 rounded-full bg-[#FF6633]/20 flex items-center justify-center mb-4">
+              <Paperclip className="w-10 h-10 text-[#FF6633]" />
             </div>
-            <h3 className="text-white text-xl font-semibold mb-2">No attachments yet</h3>
+            <h3 className="text-white text-xl font-semibold mb-2">No photos yet</h3>
             <p className="text-[#98989D] text-center max-w-sm">
-              Tap the + button to add your first attachment
+              Tap the + button to add your first photo
             </p>
           </div>
         ) : (
@@ -117,7 +114,7 @@ export function AttachmentsList() {
                 className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl p-4"
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#8E8E93]/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                  <div className="w-10 h-10 rounded-full bg-[#FF6633]/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
                     {attachment.preview ? (
                       <img src={attachment.preview} alt="" className="w-full h-full object-cover" />
                     ) : (
@@ -142,8 +139,8 @@ export function AttachmentsList() {
       {/* Floating Add Button */}
       <button
         onClick={() => router.push('/submit/attachments')}
-        className="fixed bottom-24 right-6 w-14 h-14 bg-[#8E8E93] rounded-full shadow-lg shadow-[#8E8E93]/30 flex items-center justify-center active:scale-95 transition-transform z-30"
-        aria-label="Add new attachment"
+        className="fixed bottom-24 right-6 w-14 h-14 bg-[#FF6633] rounded-full shadow-lg shadow-[#FF6633]/30 flex items-center justify-center active:scale-95 transition-transform z-30"
+        aria-label="Add new photo"
       >
         <Plus className="w-7 h-7 text-white" strokeWidth={2.5} />
       </button>

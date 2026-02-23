@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, ChevronRight, FileText } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileText, Search } from "lucide-react";
 import { SAFETY_TEMPLATES } from "@/lib/safetyTemplates";
 
 export function SafetyTemplatePicker() {
@@ -27,8 +27,7 @@ export function SafetyTemplatePicker() {
 
   return (
     <div className="min-h-screen bg-[#1C1C1E] pb-20">
-      <div className="h-12" />
-      <header className="px-4 py-4 border-b border-[#3A3A3C] sticky top-0 bg-[#1C1C1E] z-10">
+      <header className="px-4 pt-12 pb-4 border-b border-[#3A3A3C] sticky top-0 bg-[#1C1C1E] z-10">
         <div className="flex items-center gap-3 mb-4">
           <button
             onClick={() => router.back()}
@@ -45,7 +44,7 @@ export function SafetyTemplatePicker() {
           Select a safety talk PDF to {mode === "schedule" ? "schedule" : "start"}.
         </p>
         <div className="bg-[#2C2C2E] rounded-xl flex items-center gap-2 px-3 py-2.5">
-          <span className="text-[#98989D]">🔍</span>
+          <Search className="w-4 h-4 text-[#98989D] flex-shrink-0" />
           <input
             type="text"
             placeholder="Search templates"

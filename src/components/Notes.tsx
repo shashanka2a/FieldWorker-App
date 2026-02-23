@@ -12,14 +12,14 @@ export function Notes() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [cancelNavigating, setCancelNavigating] = useState(false);
-  
+
   const currentProject = {
     name: 'North Valley Solar Farm',
   };
 
   const [category, setCategory] = useState('general');
   const [notes, setNotes] = useState('');
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -50,9 +50,9 @@ export function Notes() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     setIsSubmitting(true);
-    
+
     const date = getReportDate();
     const dateKey = getDateKey(date);
     const submission = {
@@ -64,12 +64,12 @@ export function Notes() {
       photos,
     };
     saveNotes(dateKey, submission);
-    
+
     await new Promise(resolve => setTimeout(resolve, 800));
-    
+
     setIsSubmitting(false);
     setShowSuccess(true);
-    
+
     setTimeout(() => {
       router.push('/notes-list');
     }, 1200);
@@ -79,8 +79,8 @@ export function Notes() {
     return (
       <div className="min-h-screen bg-[#1C1C1E] flex items-center justify-center px-4">
         <div className="text-center">
-          <div className="w-20 h-20 bg-[#0A84FF]/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Check className="w-10 h-10 text-[#0A84FF]" aria-hidden="true" />
+          <div className="w-20 h-20 bg-[#FF6633]/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Check className="w-10 h-10 text-[#FF6633]" aria-hidden="true" />
           </div>
           <h2 className="text-white text-2xl font-semibold mb-2">Submitted!</h2>
           <p className="text-[#98989D]">Your note has been saved</p>
@@ -97,13 +97,13 @@ export function Notes() {
       {/* Header */}
       <header className="px-4 py-4 mb-6 border-b border-[#3A3A3C] sticky top-0 bg-[#1C1C1E] z-10">
         <div className="flex items-center justify-between">
-          <button 
+          <button
             onClick={() => { setCancelNavigating(true); router.push('/'); }}
             disabled={cancelNavigating}
-            className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation disabled:opacity-70"
+            className="flex items-center gap-2 text-[#FF6633] text-base touch-manipulation disabled:opacity-70"
             aria-label="Cancel and go back"
           >
-            {cancelNavigating ? <Spinner size="sm" className="border-[#0A84FF] border-t-transparent" /> : <ChevronLeft className="w-5 h-5" />}
+            {cancelNavigating ? <Spinner size="sm" className="border-[#FF6633] border-t-transparent" /> : <ChevronLeft className="w-5 h-5" />}
             <span>Cancel</span>
           </button>
           <h2 className="absolute left-1/2 -translate-x-1/2 text-white text-base font-semibold">
@@ -134,7 +134,7 @@ export function Notes() {
             id="category"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full bg-[#2C2C2E] text-white px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#0A84FF]"
+            className="w-full bg-[#2C2C2E] text-white px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633]"
           >
             {categories.map((cat) => (
               <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -154,7 +154,7 @@ export function Notes() {
             rows={8}
             placeholder="Enter your notes here..."
             required
-            className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#0A84FF] resize-none"
+            className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633] resize-none"
           />
         </div>
 
@@ -163,7 +163,7 @@ export function Notes() {
           <label className="block text-white text-sm font-medium mb-3">
             Photos
           </label>
-          
+
           {photos.length > 0 && (
             <div className="grid grid-cols-3 gap-3 mb-3">
               {photos.map((photo, index) => (
@@ -226,14 +226,14 @@ export function Notes() {
 
       {/* Fixed Bottom Submit Button */}
       <div className="fixed bottom-0 left-0 right-0 bg-[#1C1C1E] border-t border-[#3A3A3C] p-4 pb-8">
-        <p className="text-[#0A84FF] text-sm font-medium mb-2 text-center" aria-live="polite">
+        <p className="text-[#FF6633] text-sm font-medium mb-2 text-center" aria-live="polite">
           Reporting for: {formatReportDateLabel(getReportDate())}
         </p>
         <button
           type="submit"
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="w-full bg-[#0A84FF] text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity disabled:opacity-50 touch-manipulation shadow-lg flex items-center justify-center gap-2"
+          className="w-full bg-[#FF6633] text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity disabled:opacity-50 touch-manipulation shadow-lg flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <>

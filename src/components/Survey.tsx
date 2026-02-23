@@ -18,7 +18,7 @@ export function Survey() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [backNavigating, setBackNavigating] = useState(false);
-  
+
   const currentProject = {
     name: 'North Valley Solar Farm',
   };
@@ -36,22 +36,22 @@ export function Survey() {
   ]);
 
   const handleAnswerChange = (id: number, answer: 'N/A' | 'No' | 'Yes') => {
-    setQuestions(prev => prev.map(q => 
+    setQuestions(prev => prev.map(q =>
       q.id === id ? { ...q, answer } : q
     ));
   };
 
   const handleDescriptionChange = (id: number, description: string) => {
-    setQuestions(prev => prev.map(q => 
+    setQuestions(prev => prev.map(q =>
       q.id === id ? { ...q, description } : q
     ));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     setIsSubmitting(true);
-    
+
     const date = getReportDate();
     const dateKey = getDateKey(date);
     const submission = {
@@ -61,12 +61,12 @@ export function Survey() {
       questions,
     };
     saveSurvey(dateKey, submission);
-    
+
     await new Promise(resolve => setTimeout(resolve, 800));
-    
+
     setIsSubmitting(false);
     setShowSuccess(true);
-    
+
     setTimeout(() => {
       router.push('/');
     }, 1200);
@@ -76,8 +76,8 @@ export function Survey() {
     return (
       <div className="min-h-screen bg-[#1C1C1E] flex items-center justify-center px-4">
         <div className="text-center">
-          <div className="w-20 h-20 bg-[#FF9F0A]/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Check className="w-10 h-10 text-[#FF9F0A]" aria-hidden="true" />
+          <div className="w-20 h-20 bg-[#FF6633]/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Check className="w-10 h-10 text-[#FF6633]" aria-hidden="true" />
           </div>
           <h2 className="text-white text-2xl font-semibold mb-2">Submitted!</h2>
           <p className="text-[#98989D]">Your survey has been saved</p>
@@ -89,28 +89,23 @@ export function Survey() {
   return (
     <div className="min-h-screen bg-[#1C1C1E]">
       {/* Status Bar Spacer */}
-      <div className="h-12" />
-
       {/* Header */}
-      <header className="px-4 py-4 mb-6 border-b border-[#3A3A3C] sticky top-0 bg-[#1C1C1E] z-10">
-        <div className="flex items-center">
-          <button 
+      <header className="bg-[#2C2C2E] border-b border-[#3A3A3C] px-4 py-4 sticky top-0 z-20">
+        <div className="flex items-center gap-3">
+          <button
             onClick={() => { setBackNavigating(true); router.push('/'); }}
             disabled={backNavigating}
-            className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation disabled:opacity-70"
+            className="w-10 h-10 flex items-center justify-center active:bg-[#3A3A3C] rounded-lg transition-colors disabled:opacity-70"
             aria-label="Go back"
           >
-            {backNavigating ? <Spinner size="sm" className="border-[#0A84FF] border-t-transparent" /> : <ChevronLeft className="w-5 h-5" />}
-            <span>Back</span>
+            {backNavigating ? <Spinner size="sm" className="border-[#FF6633] border-t-transparent" /> : <ChevronLeft className="w-6 h-6 text-[#FF6633]" />}
           </button>
-          <h2 className="flex-1 text-center text-white text-base font-semibold pr-16">
-            Site Survey
-          </h2>
+          <h1 className="text-white text-xl font-bold flex-1">Site Survey</h1>
         </div>
       </header>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="px-4 pb-32 space-y-6">
+      <form onSubmit={handleSubmit} className="px-4 pt-6 pb-32 space-y-6">
         {/* Project */}
         <div>
           <label className="block text-[#98989D] text-sm font-medium mb-2">
@@ -130,33 +125,30 @@ export function Survey() {
               <button
                 type="button"
                 onClick={() => handleAnswerChange(q.id, 'N/A')}
-                className={`flex-1 py-3 rounded-xl font-semibold transition-colors ${
-                  q.answer === 'N/A'
-                    ? 'bg-[#FF9F0A] text-white'
-                    : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
-                }`}
+                className={`flex-1 py-3 rounded-xl font-semibold transition-colors ${q.answer === 'N/A'
+                  ? 'bg-[#FF6633] text-white'
+                  : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
+                  }`}
               >
                 N/A
               </button>
               <button
                 type="button"
                 onClick={() => handleAnswerChange(q.id, 'No')}
-                className={`flex-1 py-3 rounded-xl font-semibold transition-colors ${
-                  q.answer === 'No'
-                    ? 'bg-[#34C759] text-white'
-                    : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
-                }`}
+                className={`flex-1 py-3 rounded-xl font-semibold transition-colors ${q.answer === 'No'
+                  ? 'bg-[#34C759] text-white'
+                  : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
+                  }`}
               >
                 No
               </button>
               <button
                 type="button"
                 onClick={() => handleAnswerChange(q.id, 'Yes')}
-                className={`flex-1 py-3 rounded-xl font-semibold transition-colors ${
-                  q.answer === 'Yes'
-                    ? 'bg-[#FF453A] text-white'
-                    : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
-                }`}
+                className={`flex-1 py-3 rounded-xl font-semibold transition-colors ${q.answer === 'Yes'
+                  ? 'bg-[#FF453A] text-white'
+                  : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
+                  }`}
               >
                 Yes
               </button>
@@ -173,7 +165,7 @@ export function Survey() {
                   onChange={(e) => handleDescriptionChange(q.id, e.target.value)}
                   rows={3}
                   placeholder="Provide details..."
-                  className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF9F0A] resize-none"
+                  className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633] resize-none"
                 />
               </div>
             )}
@@ -190,7 +182,7 @@ export function Survey() {
           type="submit"
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="w-full bg-[#FF9F0A] text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity disabled:opacity-50 touch-manipulation shadow-lg flex items-center justify-center gap-2"
+          className="w-full bg-[#FF6633] text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity disabled:opacity-50 touch-manipulation shadow-lg flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <>

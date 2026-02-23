@@ -12,7 +12,7 @@ export function DailyMetrics() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [backNavigating, setBackNavigating] = useState(false);
-  
+
   const currentProject = {
     name: 'North Valley Solar Farm',
   };
@@ -22,7 +22,7 @@ export function DailyMetrics() {
   const [acresCompleted, setAcresCompleted] = useState('');
   const [numberOfOperators, setNumberOfOperators] = useState('');
   const [notes, setNotes] = useState('');
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -45,9 +45,9 @@ export function DailyMetrics() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     setIsSubmitting(true);
-    
+
     const date = getReportDate();
     const dateKey = getDateKey(date);
     const submission = {
@@ -61,12 +61,12 @@ export function DailyMetrics() {
       photos,
     };
     saveMetrics(dateKey, submission);
-    
+
     await new Promise(resolve => setTimeout(resolve, 800));
-    
+
     setIsSubmitting(false);
     setShowSuccess(true);
-    
+
     setTimeout(() => {
       router.push('/');
     }, 1200);
@@ -76,8 +76,8 @@ export function DailyMetrics() {
     return (
       <div className="min-h-screen bg-[#1C1C1E] flex items-center justify-center px-4">
         <div className="text-center">
-          <div className="w-20 h-20 bg-[#34C759]/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Check className="w-10 h-10 text-[#34C759]" aria-hidden="true" />
+          <div className="w-20 h-20 bg-[#FF6633]/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Check className="w-10 h-10 text-[#FF6633]" aria-hidden="true" />
           </div>
           <h2 className="text-white text-2xl font-semibold mb-2">Submitted!</h2>
           <p className="text-[#98989D]">Your daily metrics have been saved</p>
@@ -89,28 +89,23 @@ export function DailyMetrics() {
   return (
     <div className="min-h-screen bg-[#1C1C1E]">
       {/* Status Bar Spacer */}
-      <div className="h-12" />
-
       {/* Header */}
-      <header className="px-4 py-4 mb-6 border-b border-[#3A3A3C] sticky top-0 bg-[#1C1C1E] z-10">
-        <div className="flex items-center">
-          <button 
+      <header className="bg-[#2C2C2E] border-b border-[#3A3A3C] px-4 py-4 sticky top-0 z-20">
+        <div className="flex items-center gap-3">
+          <button
             onClick={() => { setBackNavigating(true); router.push('/'); }}
             disabled={backNavigating}
-            className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation disabled:opacity-70"
+            className="w-10 h-10 flex items-center justify-center active:bg-[#3A3A3C] rounded-lg transition-colors disabled:opacity-70"
             aria-label="Go back"
           >
-            {backNavigating ? <Spinner size="sm" className="border-[#0A84FF] border-t-transparent" /> : <ChevronLeft className="w-5 h-5" />}
-            <span>Back</span>
+            {backNavigating ? <Spinner size="sm" className="border-[#FF6633] border-t-transparent" /> : <ChevronLeft className="w-6 h-6 text-[#FF6633]" />}
           </button>
-          <h2 className="flex-1 text-center text-white text-base font-semibold pr-16">
-            Daily Metrics
-          </h2>
+          <h1 className="text-white text-xl font-bold flex-1">Daily Metrics</h1>
         </div>
       </header>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="px-4 pb-32 space-y-6">
+      <form onSubmit={handleSubmit} className="px-4 pt-6 pb-32 space-y-6">
         {/* Project */}
         <div>
           <label className="block text-[#98989D] text-sm font-medium mb-2">
@@ -137,7 +132,7 @@ export function DailyMetrics() {
               onChange={(e) => setWaterUsage(e.target.value)}
               placeholder="0.0"
               required
-              className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#34C759]"
+              className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633]"
             />
           </div>
 
@@ -153,7 +148,7 @@ export function DailyMetrics() {
               onChange={(e) => setAcresCompleted(e.target.value)}
               placeholder="0.0"
               required
-              className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#34C759]"
+              className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633]"
             />
           </div>
 
@@ -169,7 +164,7 @@ export function DailyMetrics() {
               onChange={(e) => setNumberOfOperators(e.target.value)}
               placeholder="0"
               required
-              className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#34C759]"
+              className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633]"
             />
           </div>
         </div>
@@ -194,7 +189,7 @@ export function DailyMetrics() {
           <label className="block text-white text-sm font-medium mb-3">
             Photos
           </label>
-          
+
           {photos.length > 0 && (
             <div className="grid grid-cols-3 gap-3 mb-3">
               {photos.map((photo, index) => (
@@ -264,7 +259,7 @@ export function DailyMetrics() {
           type="submit"
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="w-full bg-[#34C759] text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity disabled:opacity-50 touch-manipulation shadow-lg flex items-center justify-center gap-2"
+          className="w-full bg-[#FF6633] text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity disabled:opacity-50 touch-manipulation shadow-lg flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <>

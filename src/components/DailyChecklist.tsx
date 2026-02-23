@@ -14,7 +14,7 @@ export function DailyChecklist() {
   const [backNavigating, setBackNavigating] = useState(false);
   const [signature, setSignature] = useState<string>('');
   const [photos, setPhotos] = useState<string[]>([]);
-  
+
   const [formData, setFormData] = useState({
     machineNumber: '',
     lastFourVIN: '',
@@ -95,28 +95,23 @@ export function DailyChecklist() {
   return (
     <div className="min-h-screen bg-[#1C1C1E]">
       {/* Status Bar Spacer */}
-      <div className="h-12" />
-
       {/* Header */}
-      <header className="px-4 py-4 mb-6 border-b border-[#3A3A3C] sticky top-0 bg-[#1C1C1E] z-10">
-        <div className="flex items-center">
-          <button 
+      <header className="bg-[#2C2C2E] border-b border-[#3A3A3C] px-4 py-4 sticky top-0 z-20">
+        <div className="flex items-center gap-3">
+          <button
             onClick={() => { setBackNavigating(true); router.back(); }}
             disabled={backNavigating}
-            className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation disabled:opacity-70"
+            className="w-10 h-10 flex items-center justify-center active:bg-[#3A3A3C] rounded-lg transition-colors disabled:opacity-70"
             aria-label="Go back"
           >
-            {backNavigating ? <Spinner size="sm" className="border-[#0A84FF] border-t-transparent" /> : <ChevronLeft className="w-5 h-5" />}
-            <span>Back</span>
+            {backNavigating ? <Spinner size="sm" className="border-[#FF6633] border-t-transparent" /> : <ChevronLeft className="w-6 h-6 text-[#FF6633]" />}
           </button>
-          <h2 className="flex-1 text-center text-white text-base font-semibold pr-16">
-            Equipment Checklist
-          </h2>
+          <h1 className="text-white text-xl font-bold flex-1">Equipment Checklist</h1>
         </div>
       </header>
 
       {/* Form */}
-      <div className="px-4 pb-32 space-y-6">
+      <div className="px-4 pt-6 pb-32 space-y-6">
         {/* Machine and Operator Details */}
         <div className="space-y-4">
           <div>
@@ -215,28 +210,26 @@ export function DailyChecklist() {
             <h3 className="text-white text-lg font-semibold">Fluid Levels</h3>
             <p className="text-[#98989D] text-sm mt-1">Select an option below</p>
           </div>
-          
+
           {/* Motor Oil */}
           <div>
             <label className="block text-white text-sm font-medium mb-2">Motor Oil</label>
             <div className="flex gap-3 mb-2">
               <button
                 onClick={() => handleInputChange('motorOil', 'FULL')}
-                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
-                  formData.motorOil === 'FULL'
-                    ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
-                    : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
-                }`}
+                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${formData.motorOil === 'FULL'
+                  ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
+                  : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
+                  }`}
               >
                 FULL
               </button>
               <button
                 onClick={() => handleInputChange('motorOil', 'LOW')}
-                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
-                  formData.motorOil === 'LOW'
-                    ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
-                    : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
-                }`}
+                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${formData.motorOil === 'LOW'
+                  ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
+                  : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
+                  }`}
               >
                 LOW
               </button>
@@ -258,21 +251,19 @@ export function DailyChecklist() {
             <div className="flex gap-3 mb-2">
               <button
                 onClick={() => handleInputChange('coolant', 'FULL')}
-                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
-                  formData.coolant === 'FULL'
-                    ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
-                    : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
-                }`}
+                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${formData.coolant === 'FULL'
+                  ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
+                  : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
+                  }`}
               >
                 FULL
               </button>
               <button
                 onClick={() => handleInputChange('coolant', 'LOW')}
-                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
-                  formData.coolant === 'LOW'
-                    ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
-                    : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
-                }`}
+                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${formData.coolant === 'LOW'
+                  ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
+                  : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
+                  }`}
               >
                 LOW
               </button>
@@ -294,21 +285,19 @@ export function DailyChecklist() {
             <div className="flex gap-3 mb-2">
               <button
                 onClick={() => handleInputChange('hydraulicOil', 'FULL')}
-                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
-                  formData.hydraulicOil === 'FULL'
-                    ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
-                    : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
-                }`}
+                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${formData.hydraulicOil === 'FULL'
+                  ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
+                  : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
+                  }`}
               >
                 FULL
               </button>
               <button
                 onClick={() => handleInputChange('hydraulicOil', 'LOW')}
-                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
-                  formData.hydraulicOil === 'LOW'
-                    ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
-                    : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
-                }`}
+                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${formData.hydraulicOil === 'LOW'
+                  ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
+                  : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
+                  }`}
               >
                 LOW
               </button>
@@ -331,28 +320,26 @@ export function DailyChecklist() {
             <h3 className="text-white text-lg font-semibold">Equipment Condition</h3>
             <p className="text-[#98989D] text-sm mt-1">Select an option below</p>
           </div>
-          
+
           {/* Hoses */}
           <div>
             <label className="block text-white text-sm font-medium mb-2">Hoses</label>
             <div className="flex gap-3">
               <button
                 onClick={() => handleInputChange('hoses', 'GOOD')}
-                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
-                  formData.hoses === 'GOOD'
-                    ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
-                    : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
-                }`}
+                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${formData.hoses === 'GOOD'
+                  ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
+                  : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
+                  }`}
               >
                 GOOD
               </button>
               <button
                 onClick={() => handleInputChange('hoses', 'BAD')}
-                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
-                  formData.hoses === 'BAD'
-                    ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
-                    : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
-                }`}
+                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${formData.hoses === 'BAD'
+                  ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
+                  : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
+                  }`}
               >
                 BAD
               </button>
@@ -365,21 +352,19 @@ export function DailyChecklist() {
             <div className="flex gap-3">
               <button
                 onClick={() => handleInputChange('fanBelt', 'TIGHT')}
-                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
-                  formData.fanBelt === 'TIGHT'
-                    ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
-                    : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
-                }`}
+                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${formData.fanBelt === 'TIGHT'
+                  ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
+                  : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
+                  }`}
               >
                 TIGHT
               </button>
               <button
                 onClick={() => handleInputChange('fanBelt', 'LOOSE')}
-                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
-                  formData.fanBelt === 'LOOSE'
-                    ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
-                    : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
-                }`}
+                className={`flex-1 py-3 rounded-xl font-semibold transition-all ${formData.fanBelt === 'LOOSE'
+                  ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
+                  : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
+                  }`}
               >
                 LOOSE
               </button>
@@ -407,21 +392,19 @@ export function DailyChecklist() {
               <div className="flex gap-3">
                 <button
                   onClick={() => handleInputChange('attachmentCondition', 'GOOD')}
-                  className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
-                    formData.attachmentCondition === 'GOOD'
-                      ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
-                      : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
-                  }`}
+                  className={`flex-1 py-3 rounded-xl font-semibold transition-all ${formData.attachmentCondition === 'GOOD'
+                    ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
+                    : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
+                    }`}
                 >
                   GOOD
                 </button>
                 <button
                   onClick={() => handleInputChange('attachmentCondition', 'BAD')}
-                  className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
-                    formData.attachmentCondition === 'BAD'
-                      ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
-                      : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
-                  }`}
+                  className={`flex-1 py-3 rounded-xl font-semibold transition-all ${formData.attachmentCondition === 'BAD'
+                    ? 'bg-[#2C2C2E] border-2 border-[#FF6633] text-[#FF6633]'
+                    : 'bg-[#2C2C2E] border border-[#3A3A3C] text-[#98989D]'
+                    }`}
                 >
                   BAD
                 </button>
@@ -433,7 +416,7 @@ export function DailyChecklist() {
         {/* Repairs & Issues */}
         <div className="space-y-4">
           <h3 className="text-white text-lg font-semibold">Repairs & Issues</h3>
-          
+
           <div>
             <label htmlFor="repairsNeeded" className="block text-white text-sm font-medium mb-2">
               Repairs Needed
@@ -451,10 +434,10 @@ export function DailyChecklist() {
           {/* Photos */}
           <div>
             <label className="block text-white text-sm font-medium mb-3">
-              Photos {formData.hoses === 'BAD' || formData.fanBelt === 'LOOSE' || formData.attachmentCondition === 'BAD' ? 
+              Photos {formData.hoses === 'BAD' || formData.fanBelt === 'LOOSE' || formData.attachmentCondition === 'BAD' ?
                 <span className="text-[#FF453A]">*</span> : null}
             </label>
-            
+
             {photos.length > 0 && (
               <div className="grid grid-cols-3 gap-3 mb-3">
                 {photos.map((photo, index) => (
@@ -492,7 +475,7 @@ export function DailyChecklist() {
         {/* Digital Signature */}
         <div className="space-y-4">
           <h3 className="text-white text-lg font-semibold">Operator Signature <span className="text-[#FF453A]">*</span></h3>
-          
+
           {!signature ? (
             <div className="space-y-3">
               <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl p-4">

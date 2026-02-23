@@ -2,9 +2,9 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, Printer } from "lucide-react";
+import { ChevronLeft, PenLine, CheckCircle2 } from "lucide-react";
 import { ReportPreview } from "@/components/ReportPreview";
-import { getReportForDate } from "@/lib/dailyReportStorage";
+import { getReportForDate, getDateKey } from "@/lib/dailyReportStorage";
 
 const DEFAULT_PREPARED_BY = "Ricky Smith";
 
@@ -53,40 +53,52 @@ function ReportPreviewContent() {
     return () => document.removeEventListener("visibilitychange", onVisibilityChange);
   }, [mounted, loadReport]);
 
-  const handlePrint = useCallback(() => {
-    window.print();
-  }, []);
+  const isSigned = !!data?.signed;
+
+  const handleSign = useCallback(() => {
+    if (!data) return;
+    const dateKey = data.dateKey;
+    router.push(`/report/sign?date=${dateKey}`);
+  }, [data, router]);
 
   return (
     <div className="min-h-screen bg-[#1C1C1E] pb-24">
-      <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#3A3A3C] bg-[#1C1C1E] px-4 py-3">
+      <header className="bg-[#2C2C2E] border-b border-[#3A3A3C] px-4 py-4 sticky top-0 z-10 flex items-center gap-3">
         <button
           type="button"
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation"
+          className="w-10 h-10 flex items-center justify-center active:bg-[#3A3A3C] rounded-lg transition-colors"
           aria-label="Go back"
         >
-          <ChevronLeft className="w-5 h-5" />
-          Back
+          <ChevronLeft className="w-6 h-6 text-[#FF6633]" />
         </button>
-        <h1 className="text-white text-base font-semibold">Report Preview</h1>
-        <button
-          type="button"
-          onClick={handlePrint}
-          className="flex items-center gap-2 rounded-lg bg-[#2C2C2E] px-3 py-2 text-white text-sm"
-          aria-label="Print"
-        >
-          <Printer className="w-4 h-4" />
-          Print
-        </button>
-      </div>
+        <h1 className="text-white text-xl font-bold flex-1">Report Preview</h1>
+
+        {/* Sign / Signed indicator */}
+        {isSigned ? (
+          <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#30D158]/15">
+            <CheckCircle2 className="w-4 h-4 text-[#30D158]" />
+            <span className="text-[#30D158] text-sm font-semibold">Signed</span>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={handleSign}
+            className="flex items-center gap-1.5 rounded-lg bg-[#FF6633] px-3 py-2 text-white text-sm font-semibold active:opacity-80 transition-opacity"
+            aria-label="Sign report"
+          >
+            <PenLine className="w-4 h-4" />
+            Sign
+          </button>
+        )}
+      </header>
 
       <div className="p-4 print:p-0">
         {data ? (
           <ReportPreview
             data={data}
             preparedBy={DEFAULT_PREPARED_BY}
-            showSignatureBlock={!!data.signed}
+            showSignatureBlock={isSigned}
             signatureDataUrl={data.signed?.signatureDataUrl ?? null}
             signedAt={data.signed?.signedAt ?? null}
           />

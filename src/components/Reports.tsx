@@ -56,26 +56,22 @@ export function Reports() {
 
   return (
     <div className="min-h-screen bg-[#1C1C1E] pb-20">
-      <div className="h-12" />
-      <header className="px-4 py-4 mb-4">
-        <div className="flex items-center justify-between mb-4">
+      {/* Header */}
+      <header className="bg-[#2C2C2E] border-b border-[#3A3A3C] px-4 py-4 sticky top-0 z-20">
+        <div className="flex items-center gap-3">
           <button
             onClick={handleBack}
             disabled={navigating}
-            className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation disabled:opacity-70"
+            className="w-10 h-10 flex items-center justify-center active:bg-[#3A3A3C] rounded-lg transition-colors disabled:opacity-70"
             aria-label="Go back"
           >
-            {navigating ? <Spinner size="sm" className="border-[#0A84FF] border-t-transparent" /> : <ChevronLeft className="w-5 h-5" />}
-            <span>Back</span>
+            {navigating ? <Spinner size="sm" className="border-[#FF6633] border-t-transparent" /> : <ChevronLeft className="w-6 h-6 text-[#FF6633]" />}
           </button>
-          <h2 className="absolute left-1/2 -translate-x-1/2 text-white text-base font-semibold">
-            Reports
-          </h2>
-          <div className="w-16" />
+          <h1 className="text-white text-xl font-bold flex-1">Submitted Reports</h1>
         </div>
       </header>
 
-      <div className="px-4">
+      <div className="px-4 pt-5">
         {signedReports.length === 0 ? (
           <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl p-6 text-center">
             <div className="text-white text-lg font-semibold mb-2">No submitted reports yet</div>

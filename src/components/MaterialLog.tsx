@@ -20,7 +20,7 @@ export function MaterialLog() {
   const [showWarning, setShowWarning] = useState(false);
   const [warningMessage, setWarningMessage] = useState('');
   const [backNavigating, setBackNavigating] = useState(false);
-  
+
   const currentProject = {
     name: 'North Valley Solar Farm',
   };
@@ -34,9 +34,9 @@ export function MaterialLog() {
     { name: 'Ecomazapyr 2SL', quantity: '', unit: 'GAL' },
     { name: 'Regular Dye', quantity: '', unit: 'oz' },
   ]);
-  
+
   const [notes, setNotes] = useState('');
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -101,9 +101,9 @@ export function MaterialLog() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     setIsSubmitting(true);
-    
+
     const usedChemicals = chemicals.filter(c => c.quantity && parseFloat(c.quantity) > 0);
     const date = getReportDate();
     const dateKey = getDateKey(date);
@@ -116,12 +116,12 @@ export function MaterialLog() {
       photos,
     };
     saveChemicals(dateKey, submission);
-    
+
     await new Promise(resolve => setTimeout(resolve, 800));
-    
+
     setIsSubmitting(false);
     setShowSuccess(true);
-    
+
     setTimeout(() => {
       router.push('/');
     }, 1200);
@@ -131,8 +131,8 @@ export function MaterialLog() {
     return (
       <div className="min-h-screen bg-[#1C1C1E] flex items-center justify-center px-4">
         <div className="text-center">
-          <div className="w-20 h-20 bg-[#5856D6]/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Check className="w-10 h-10 text-[#5856D6]" aria-hidden="true" />
+          <div className="w-20 h-20 bg-[#FF6633]/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Check className="w-10 h-10 text-[#FF6633]" aria-hidden="true" />
           </div>
           <h2 className="text-white text-2xl font-semibold mb-2">Submitted!</h2>
           <p className="text-[#98989D]">Your chemical usage has been saved</p>
@@ -144,28 +144,23 @@ export function MaterialLog() {
   return (
     <div className="min-h-screen bg-[#1C1C1E]">
       {/* Status Bar Spacer */}
-      <div className="h-12" />
-
       {/* Header */}
-      <header className="px-4 py-4 mb-6 border-b border-[#3A3A3C] sticky top-0 bg-[#1C1C1E] z-10">
-        <div className="flex items-center">
-          <button 
+      <header className="bg-[#2C2C2E] border-b border-[#3A3A3C] px-4 py-4 sticky top-0 z-20">
+        <div className="flex items-center gap-3">
+          <button
             onClick={() => { setBackNavigating(true); router.push('/'); }}
             disabled={backNavigating}
-            className="flex items-center gap-2 text-[#0A84FF] text-base touch-manipulation disabled:opacity-70"
+            className="w-10 h-10 flex items-center justify-center active:bg-[#3A3A3C] rounded-lg transition-colors disabled:opacity-70"
             aria-label="Go back"
           >
-            {backNavigating ? <Spinner size="sm" className="border-[#0A84FF] border-t-transparent" /> : <ChevronLeft className="w-5 h-5" />}
-            <span>Back</span>
+            {backNavigating ? <Spinner size="sm" className="border-[#FF6633] border-t-transparent" /> : <ChevronLeft className="w-6 h-6 text-[#FF6633]" />}
           </button>
-          <h2 className="flex-1 text-center text-white text-base font-semibold pr-16">
-            Chemicals
-          </h2>
+          <h1 className="text-white text-xl font-bold flex-1">Chemicals</h1>
         </div>
       </header>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="px-4 pb-32 space-y-6">
+      <form onSubmit={handleSubmit} className="px-4 pt-6 pb-32 space-y-6">
         {/* Warning Banner */}
         {showWarning && (
           <div className="bg-[#FF9F0A]/20 border border-[#FF9F0A] rounded-xl p-4 flex items-start gap-3">
@@ -203,7 +198,7 @@ export function MaterialLog() {
                       value={chemical.name}
                       onChange={(e) => updateChemicalName(index, e.target.value)}
                       placeholder="Chemical name"
-                      className="w-full bg-[#1C1C1E] text-white placeholder-[#98989D] px-3 py-2.5 rounded-lg outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#5856D6]"
+                      className="w-full bg-[#1C1C1E] text-white placeholder-[#98989D] px-3 py-2.5 rounded-lg outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633]"
                     />
                   ) : (
                     <div className="text-white font-medium">{chemical.name}</div>
@@ -215,13 +210,13 @@ export function MaterialLog() {
                       value={chemical.quantity}
                       onChange={(e) => updateChemicalQuantity(index, e.target.value)}
                       placeholder="0.0"
-                      className="flex-1 bg-[#1C1C1E] text-white placeholder-[#98989D] px-3 py-2.5 rounded-lg outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#5856D6]"
+                      className="flex-1 bg-[#1C1C1E] text-white placeholder-[#98989D] px-3 py-2.5 rounded-lg outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633]"
                     />
                     {index >= 6 ? (
                       <select
                         value={chemical.unit}
                         onChange={(e) => updateChemicalUnit(index, e.target.value)}
-                        className="bg-[#1C1C1E] text-white px-4 py-2.5 rounded-lg border border-[#3A3A3C] font-medium focus:ring-2 focus:ring-[#5856D6]"
+                        className="bg-[#1C1C1E] text-white px-4 py-2.5 rounded-lg border border-[#3A3A3C] font-medium focus:ring-2 focus:ring-[#FF6633]"
                       >
                         <option value="GAL">GAL</option>
                         <option value="oz">oz</option>
@@ -252,7 +247,7 @@ export function MaterialLog() {
           <button
             type="button"
             onClick={addCustomChemical}
-            className="w-full bg-[#2C2C2E] border-2 border-dashed border-[#5856D6] text-[#5856D6] py-3 rounded-xl flex items-center justify-center gap-2 active:bg-[#3A3A3C] transition-colors touch-manipulation"
+            className="w-full bg-[#2C2C2E] border-2 border-dashed border-[#FF6633] text-[#FF6633] py-3 rounded-xl flex items-center justify-center gap-2 active:bg-[#3A3A3C] transition-colors touch-manipulation"
           >
             <Plus className="w-5 h-5" aria-hidden="true" />
             <span className="font-medium">Add Custom Chemical</span>
@@ -270,7 +265,7 @@ export function MaterialLog() {
             onChange={(e) => setNotes(e.target.value)}
             rows={4}
             placeholder="Add any additional notes..."
-            className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#5856D6] resize-none"
+            className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633] resize-none"
           />
         </div>
 
@@ -279,7 +274,7 @@ export function MaterialLog() {
           <label className="block text-white text-sm font-medium mb-3">
             Photos
           </label>
-          
+
           {photos.length > 0 && (
             <div className="grid grid-cols-3 gap-3 mb-3">
               {photos.map((photo, index) => (
@@ -349,7 +344,7 @@ export function MaterialLog() {
           type="submit"
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="w-full bg-[#5856D6] text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity disabled:opacity-50 touch-manipulation shadow-lg flex items-center justify-center gap-2"
+          className="w-full bg-[#FF6633] text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity disabled:opacity-50 touch-manipulation shadow-lg flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <>

@@ -54,18 +54,15 @@ export function NotesList() {
 
   return (
     <div className="min-h-screen bg-[#1C1C1E] pb-20">
-      {/* Status Bar Spacer */}
-      <div className="h-12" />
-
       {/* Header */}
-      <header className="bg-[#2C2C2E] border-b border-[#3A3A3C] px-4 py-3 sticky top-12 z-20">
+      <header className="bg-[#2C2C2E] border-b border-[#3A3A3C] px-4 py-4 sticky top-0 z-20">
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push('/')}
             className="w-10 h-10 flex items-center justify-center active:bg-[#3A3A3C] rounded-lg transition-colors"
             aria-label="Go back"
           >
-            <ChevronLeft className="w-6 h-6 text-[#0A84FF]" />
+            <ChevronLeft className="w-6 h-6 text-[#FF6633]" />
           </button>
           <h1 className="text-white text-xl font-bold flex-1">Notes</h1>
         </div>
@@ -76,8 +73,8 @@ export function NotesList() {
         {notes.length === 0 ? (
           // Empty State
           <div className="flex flex-col items-center justify-center py-20 px-4">
-            <div className="w-20 h-20 rounded-full bg-[#0A84FF]/20 flex items-center justify-center mb-4">
-              <FileText className="w-10 h-10 text-[#0A84FF]" />
+            <div className="w-20 h-20 rounded-full bg-[#FF6633]/20 flex items-center justify-center mb-4">
+              <FileText className="w-10 h-10 text-[#FF6633]" />
             </div>
             <h3 className="text-white text-xl font-semibold mb-2">No notes yet</h3>
             <p className="text-[#98989D] text-center max-w-sm">
@@ -93,8 +90,8 @@ export function NotesList() {
                 className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl p-4"
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#0A84FF]/20 flex items-center justify-center flex-shrink-0">
-                    <FileText className="w-5 h-5 text-[#0A84FF]" />
+                  <div className="w-10 h-10 rounded-full bg-[#FF6633]/20 flex items-center justify-center flex-shrink-0">
+                    <FileText className="w-5 h-5 text-[#FF6633]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-white text-sm leading-relaxed mb-2 line-clamp-3">
@@ -103,7 +100,7 @@ export function NotesList() {
                     <div className="text-[#98989D] text-xs flex items-center gap-2">
                       <span>{note.date} • {note.timestamp}</span>
                       {note.hasPhotos && (
-                        <span className="text-[#0A84FF] text-[10px] font-medium">Photo</span>
+                        <span className="text-[#FF6633] text-[10px] font-medium">Photo</span>
                       )}
                     </div>
                   </div>
@@ -117,7 +114,7 @@ export function NotesList() {
       {/* Floating Add Button */}
       <button
         onClick={() => router.push('/submit/notes')}
-        className="fixed bottom-24 right-6 w-14 h-14 bg-[#0A84FF] rounded-full shadow-lg shadow-[#0A84FF]/30 flex items-center justify-center active:scale-95 transition-transform z-30"
+        className="fixed bottom-24 right-6 w-14 h-14 bg-[#FF6633] rounded-full shadow-lg shadow-[#FF6633]/30 flex items-center justify-center active:scale-95 transition-transform z-30"
         aria-label="Add new note"
       >
         <Plus className="w-7 h-7 text-white" strokeWidth={2.5} />

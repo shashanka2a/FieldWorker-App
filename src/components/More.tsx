@@ -28,8 +28,8 @@ export function More() {
       name: 'Reports',
       icon: FileText,
       route: '/reports',
-      color: '#0A84FF',
-      description: 'View and generate reports',
+      color: '#FF6633',
+      description: 'View submitted reports',
     },
     {
       id: 'gallery',
@@ -108,7 +108,7 @@ export function More() {
               disabled={!!navigatingTo}
               className="w-full bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl p-4 flex items-center gap-4 active:bg-[#3A3A3C] transition-colors disabled:opacity-70"
             >
-              <div 
+              <div
                 className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
                 style={{ backgroundColor: `${item.color}20` }}
               >

@@ -28,7 +28,7 @@ export function SubmitAttachments() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const id = Math.random().toString(36).substr(2, 9);
-      
+
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = (event) => {
@@ -87,20 +87,17 @@ export function SubmitAttachments() {
 
   return (
     <div className="min-h-screen bg-[#1C1C1E] pb-20">
-      {/* Status Bar Spacer */}
-      <div className="h-12" />
-
       {/* Header */}
-      <header className="bg-[#2C2C2E] border-b border-[#3A3A3C] px-4 py-3 sticky top-12 z-20">
+      <header className="bg-[#2C2C2E] border-b border-[#3A3A3C] px-4 py-4 sticky top-0 z-20">
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push('/attachments-list')}
             className="w-10 h-10 flex items-center justify-center active:bg-[#3A3A3C] rounded-lg transition-colors"
             aria-label="Go back"
           >
-            <ChevronLeft className="w-6 h-6 text-[#0A84FF]" />
+            <ChevronLeft className="w-6 h-6 text-[#FF6633]" />
           </button>
-          <h1 className="text-white text-xl font-bold flex-1">Add Attachments</h1>
+          <h1 className="text-white text-xl font-bold flex-1">Add Photos</h1>
         </div>
       </header>
 
@@ -113,10 +110,10 @@ export function SubmitAttachments() {
           </label>
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-full bg-[#2C2C2E] border-2 border-dashed border-[#3A3A3C] rounded-2xl p-8 flex flex-col items-center justify-center gap-3 active:bg-[#3A3A3C] transition-colors"
+            className="w-full bg-[#2C2C2E] border-2 border-dashed border-[#FF6633]/40 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 active:bg-[#3A3A3C] transition-colors"
           >
-            <div className="w-16 h-16 rounded-full bg-[#8E8E93]/20 flex items-center justify-center">
-              <Upload className="w-8 h-8 text-[#8E8E93]" />
+            <div className="w-16 h-16 rounded-full bg-[#FF6633]/15 flex items-center justify-center">
+              <Upload className="w-8 h-8 text-[#FF6633]" />
             </div>
             <div className="text-white font-medium">Tap to upload files</div>
             <div className="text-[#98989D] text-sm">Images, PDFs, or Documents</div>
@@ -176,28 +173,28 @@ export function SubmitAttachments() {
         )}
 
         {/* Notes */}
-        <div className="mb-32">
+        <div className="mb-6">
           <label className="text-[#98989D] text-sm font-semibold mb-2 block">
             Notes (Optional)
           </label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Add any additional notes about these attachments..."
-            className="w-full bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl px-4 py-3 text-white placeholder-[#98989D] focus:outline-none focus:ring-2 focus:ring-[#8E8E93] min-h-[100px]"
+            placeholder="Add any additional notes about these photos..."
+            className="w-full bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl px-4 py-3 text-white placeholder-[#98989D] focus:outline-none focus:ring-2 focus:ring-[#FF6633] min-h-[100px]"
           />
         </div>
       </div>
 
-      {/* Fixed bottom: Reporting for + Submit (like Notes) */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[#1C1C1E] border-t border-[#3A3A3C] p-4 pb-8">
-        <p className="text-[#0A84FF] text-sm font-medium mb-2 text-center" aria-live="polite">
+      {/* Fixed bottom submit — sits just above the bottom nav bar */}
+      <div className="fixed bottom-16 left-0 right-0 bg-[#1C1C1E] border-t border-[#3A3A3C] px-4 pt-3 pb-4">
+        <p className="text-[#FF6633] text-sm font-medium mb-2 text-center" aria-live="polite">
           Reporting for: {formatReportDateLabel(getReportDate())}
         </p>
         <button
           onClick={handleSubmit}
           disabled={uploadedFiles.length === 0 || isSubmitting}
-          className="w-full bg-[#8E8E93] text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity disabled:opacity-50 touch-manipulation shadow-lg flex items-center justify-center gap-2"
+          className="w-full bg-[#FF6633] text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity disabled:opacity-50 touch-manipulation shadow-lg shadow-[#FF6633]/20 flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <>
@@ -205,7 +202,7 @@ export function SubmitAttachments() {
               <span>Submitting...</span>
             </>
           ) : (
-            'Submit Attachments'
+            'Submit Photos'
           )}
         </button>
       </div>
