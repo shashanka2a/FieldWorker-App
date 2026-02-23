@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { FileText, ClipboardList, Droplet, BarChart3, Wrench, Camera, ChevronDown, ChevronLeft, ChevronRight, Calendar, Eye, PenTool } from 'lucide-react';
+import { FileText, ClipboardList, Droplet, BarChart3, Wrench, Camera, ChevronDown, ChevronLeft, ChevronRight, Calendar, Eye, PenTool, HardHat } from 'lucide-react';
 import { BottomNav } from './BottomNav';
 import { Spinner } from './ui/spinner';
 import { getDateKey, getSignedReport } from '@/lib/dailyReportStorage';
@@ -172,6 +172,13 @@ export function Home() {
       icon: Camera, 
       route: '/attachments-list',
       color: '#8E8E93',
+    },
+    {
+      id: 'safety',
+      name: 'Safety',
+      icon: HardHat,
+      route: '/safety',
+      color: '#FF6633',
     },
   ];
 

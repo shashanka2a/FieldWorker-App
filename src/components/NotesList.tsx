@@ -37,11 +37,8 @@ function loadNotesFromStorage(): Note[] {
 export function NotesList() {
   const router = useRouter();
   const [notes, setNotes] = useState<Note[]>([]);
-  const [reportDateLabel, setReportDateLabel] = useState<string>("");
 
   const refreshNotes = useCallback(() => {
-    const date = getReportDate();
-    setReportDateLabel(formatReportDateLabel(date));
     setNotes(loadNotesFromStorage());
   }, []);
 
@@ -72,9 +69,6 @@ export function NotesList() {
           </button>
           <h1 className="text-white text-xl font-bold flex-1">Notes</h1>
         </div>
-        {reportDateLabel && (
-          <p className="text-[#98989D] text-xs mt-1">For {reportDateLabel}</p>
-        )}
       </header>
 
       {/* Content */}

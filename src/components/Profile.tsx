@@ -44,7 +44,7 @@ export function Profile() {
     { id: 'materials', name: 'Materials', icon: Package, route: '/material-log', color: '#FF6633' },
     { id: 'equipment', name: 'Equipment', icon: Wrench, route: '/submit/equipment', color: '#FF6633' },
     { id: 'checklists', name: 'Checklists', icon: ClipboardList, route: '#', color: '#FF6633' },
-    { id: 'toolbox-talks', name: 'Toolbox talks', icon: MessageSquare, route: '#', color: '#FF6633' },
+    { id: 'safety', name: 'Safety', icon: HardHat, route: '/safety', color: '#FF6633' },
     { id: 'directory', name: 'Directory', icon: Users, route: '#', color: '#FF6633' },
     { id: 'observations', name: 'Observations', icon: Eye, route: '#', color: '#FF6633' },
     { id: 'incidents', name: 'Incidents', icon: AlertTriangle, route: '/submit/incident', color: '#FF6633' },
