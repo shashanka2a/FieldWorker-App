@@ -353,12 +353,12 @@ export function Home() {
   }, [selectedDate]);
 
   return (
-    <div className="min-h-screen bg-[#1C1C1E] pb-20">
+    <div className="h-screen bg-[#1C1C1E] flex flex-col overflow-hidden">
       {/* Status Bar Spacer */}
-      <div className="h-10" />
+      <div className="h-10 flex-shrink-0" />
 
       {/* Header */}
-      <header className="px-4 py-3 mb-2">
+      <header className="px-4 pt-1 pb-3 flex-shrink-0">
 
         {/* Project Selector */}
         <div>
@@ -406,8 +406,8 @@ export function Home() {
       </header>
 
       {/* Daily Logs Calendar Section */}
-      <div className="px-4 mb-4">
-        <div className="flex items-center justify-between mb-2">
+      <div className="px-4 mb-2 flex-shrink-0">
+        <div className="flex items-center justify-between mb-1.5">
           <h3 className="text-white text-xl font-bold">Daily logs</h3>
           <button
             onClick={() => setShowCalendar(!showCalendar)}
@@ -417,26 +417,43 @@ export function Home() {
             <Calendar className="w-5 h-5 text-[#FF6633]" />
           </button>
         </div>
-        <p className="text-[#FF6633] text-sm font-medium mb-2" aria-live="polite">
+        <p className="text-[#FF6633] text-xs font-medium mb-2" aria-live="polite">
           Reporting for: {selectedDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}
         </p>
 
-        {/* Horizontal Scrollable Calendar */}
-        <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl p-3">
-          {/* Day Labels */}
-          <div className="flex gap-6 overflow-x-auto scrollbar-hide" style={{ scrollBehavior: 'smooth' }} ref={calendarScrollRef}>
+        {/* Horizontal Scrollable Calendar — weekdays only */}
+        <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl px-3 py-3">
+          <div className="flex gap-4 overflow-x-auto scrollbar-hide" style={{ scrollBehavior: 'smooth' }} ref={calendarScrollRef}>
             {(() => {
-              const dates = [];
-              const start = new Date(selectedDate);
-              start.setDate(start.getDate() - 10); // Show 10 days before
-
-              for (let i = 0; i < 21; i++) {
-                const date = new Date(start);
-                date.setDate(start.getDate() + i);
-                dates.push(date);
+              // Build a list of 14 weekdays: 7 before selected, selected, then up to 6 after
+              const weekdays: Date[] = [];
+              const cursor = new Date(selectedDate);
+              // Step back to find 7 weekdays before selected
+              let before = 0;
+              const tmp = new Date(selectedDate);
+              while (before < 7) {
+                tmp.setDate(tmp.getDate() - 1);
+                if (tmp.getDay() !== 0 && tmp.getDay() !== 6) {
+                  weekdays.unshift(new Date(tmp));
+                  before++;
+                }
+              }
+              // Add selected date if weekday
+              if (cursor.getDay() !== 0 && cursor.getDay() !== 6) {
+                weekdays.push(new Date(cursor));
+              }
+              // Add 6 weekdays after
+              const after = new Date(selectedDate);
+              let count = 0;
+              while (count < 6) {
+                after.setDate(after.getDate() + 1);
+                if (after.getDay() !== 0 && after.getDay() !== 6) {
+                  weekdays.push(new Date(after));
+                  count++;
+                }
               }
 
-              return dates.map((date, idx) => {
+              return weekdays.map((date, idx) => {
                 const isSelectedDate = date.toDateString() === selectedDate.toDateString();
                 const isTodayDate = date.toDateString() === today.toDateString();
                 const isFutureDate = date > today;
@@ -454,16 +471,17 @@ export function Home() {
                       }
                     }}
                     disabled={isFutureDate}
-                    className="flex flex-col items-center gap-2 flex-shrink-0"
+                    className="flex flex-col items-center gap-1.5 flex-shrink-0"
                   >
-                    <div className={`text-xs font-medium ${isFutureDate ? 'text-[#48484A]' : 'text-[#98989D]'}`}>{dayLetter}</div>
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-colors ${isFutureDate
-                      ? 'text-[#48484A] cursor-not-allowed'
-                      : isSelectedDate
-                        ? 'bg-[#0A84FF] text-white'
-                        : isTodayDate
-                          ? 'bg-[#0A84FF]/30 text-[#0A84FF]'
-                          : 'text-white hover:bg-[#3A3A3C]'
+                    <div className={`text-[11px] font-semibold uppercase tracking-wide ${isFutureDate ? 'text-[#48484A]' : 'text-[#98989D]'
+                      }`}>{dayLetter}</div>
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center font-semibold text-sm transition-colors ${isFutureDate
+                        ? 'text-[#48484A] cursor-not-allowed'
+                        : isSelectedDate
+                          ? 'bg-[#0A84FF] text-white'
+                          : isTodayDate
+                            ? 'bg-[#0A84FF]/25 text-[#0A84FF]'
+                            : 'text-white hover:bg-[#3A3A3C]'
                       }`}>
                       {dayNum}
                     </div>
@@ -527,9 +545,9 @@ export function Home() {
                       className={`flex flex-col items-center justify-start pt-1.5 pb-1 rounded-lg text-sm font-medium transition-colors h-12 ${!day
                         ? 'invisible'
                         : isSelected(day)
-                          ? 'bg-[#FF6633] text-white'
+                          ? 'bg-[#0A84FF] text-white'
                           : isToday(day)
-                            ? 'bg-[#FF6633]/20 text-[#FF6633]'
+                            ? 'bg-[#0A84FF]/20 text-[#0A84FF]'
                             : 'text-white hover:bg-[#3A3A3C]'
                         }`}
                     >
@@ -560,9 +578,9 @@ export function Home() {
         )}
       </div>
 
-      {/* Primary Tasks Grid — 3×3 */}
-      <div className="px-4 mb-4">
-        <div className="grid grid-cols-3 gap-4">
+      {/* Primary Tasks Grid — 3×3, fills remaining screen height */}
+      <div className="px-4 flex-1 min-h-0 pb-20">
+        <div className="grid grid-cols-3 gap-3 h-full">
           {primaryTasks.map((task) => {
             const isLoading = navigatingToRoute === task.route;
             return (
@@ -573,12 +591,12 @@ export function Home() {
                   router.push(task.route);
                 }}
                 disabled={!!navigatingToRoute}
-                className="flex flex-col items-center gap-2.5 touch-manipulation focus:outline-none disabled:opacity-60"
+                className="flex flex-col items-center gap-1.5 touch-manipulation focus:outline-none disabled:opacity-60 min-h-0"
                 aria-label={task.name}
               >
-                {/* Icon tile */}
-                <div className="w-full aspect-square bg-[#2C2C2E] rounded-[22px] flex items-center justify-center border border-[#3A3A3C] active:scale-95 transition-transform"
-                  style={{ boxShadow: '0 2px 10px rgba(0,0,0,0.4)' }}
+                {/* Icon tile — fills cell height */}
+                <div className="w-full flex-1 min-h-0 bg-[#2C2C2E] rounded-[22px] flex items-center justify-center border border-[#3A3A3C] active:scale-95 transition-transform"
+                  style={{ boxShadow: '0 2px 10px rgba(0,0,0,0.4)', aspectRatio: '1' }}
                 >
                   {isLoading ? (
                     <Spinner size="lg" className="border-[#FF6633] border-t-transparent" />
@@ -589,7 +607,7 @@ export function Home() {
                   )}
                 </div>
                 {/* Label */}
-                <span className="text-white text-[14px] font-semibold text-center leading-tight w-full">
+                <span className="text-white text-[13px] font-semibold text-center leading-tight w-full flex-shrink-0">
                   {task.name}
                 </span>
               </button>

@@ -30,9 +30,8 @@ export function BottomNav({ activeTab }: BottomNavProps) {
         <button
           onClick={() => handleNav('/')}
           disabled={!!navigatingTo}
-          className={`flex flex-col items-center justify-center gap-1 flex-1 h-full touch-manipulation focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#FF6633] disabled:opacity-70 ${
-            activeTab === 'home' ? 'text-[#0A84FF]' : 'text-[#98989D]'
-          }`}
+          className={`flex flex-col items-center justify-center gap-1 flex-1 h-full touch-manipulation focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#FF6633] disabled:opacity-70 ${activeTab === 'home' ? 'text-[#0A84FF]' : 'text-[#98989D]'
+            }`}
           aria-label="Home"
           aria-current={activeTab === 'home' ? 'page' : undefined}
         >
@@ -47,9 +46,8 @@ export function BottomNav({ activeTab }: BottomNavProps) {
         <button
           onClick={() => handleNav('/activity')}
           disabled={!!navigatingTo}
-          className={`flex flex-col items-center justify-center gap-1 flex-1 h-full touch-manipulation focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#FF6633] disabled:opacity-70 ${
-            activeTab === 'activity' ? 'text-[#0A84FF]' : 'text-[#98989D]'
-          }`}
+          className={`flex flex-col items-center justify-center gap-1 flex-1 h-full touch-manipulation focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#FF6633] disabled:opacity-70 ${activeTab === 'activity' ? 'text-[#0A84FF]' : 'text-[#98989D]'
+            }`}
           aria-label="Activity"
           aria-current={activeTab === 'activity' ? 'page' : undefined}
         >
@@ -64,9 +62,8 @@ export function BottomNav({ activeTab }: BottomNavProps) {
         <button
           onClick={() => handleNav('/more')}
           disabled={!!navigatingTo}
-          className={`flex flex-col items-center justify-center gap-1 flex-1 h-full touch-manipulation focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#FF6633] disabled:opacity-70 ${
-            activeTab === 'more' ? 'text-[#0A84FF]' : 'text-[#98989D]'
-          }`}
+          className={`flex flex-col items-center justify-center gap-1 flex-1 h-full touch-manipulation focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#FF6633] disabled:opacity-70 ${activeTab === 'more' ? 'text-[#0A84FF]' : 'text-[#98989D]'
+            }`}
           aria-label="More"
           aria-current={activeTab === 'more' ? 'page' : undefined}
         >
