@@ -16,7 +16,6 @@ interface Chemical {
 
 export function MaterialLog() {
   const router = useRouter();
-  const [photos, setPhotos] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
@@ -28,23 +27,40 @@ export function MaterialLog() {
     name: 'North Valley Solar Farm',
   };
 
-  // Pre-populated chemical list with quantities
-  const [chemicals, setChemicals] = useState<Chemical[]>([
+  const defaultChemicals: Chemical[] = [
     { name: 'Glyphosate', quantity: '', unit: 'GAL' },
     { name: 'Surfactant', quantity: '', unit: 'oz' },
     { name: 'Super Dye', quantity: '', unit: 'GAL' },
     { name: '2,4-D', quantity: '', unit: 'GAL' },
     { name: 'Ecomazapyr 2SL', quantity: '', unit: 'GAL' },
     { name: 'Regular Dye', quantity: '', unit: 'oz' },
-  ]);
+  ];
 
-  const [notes, setNotes] = useState('');
+  // Separate state per application type
+  const [wickingData, setWickingData] = useState<{ chemicals: Chemical[]; notes: string; photos: string[] }>({
+    chemicals: defaultChemicals.map(c => ({ ...c })),
+    notes: '',
+    photos: [],
+  });
+  const [sprayingData, setSprayingData] = useState<{ chemicals: Chemical[]; notes: string; photos: string[] }>({
+    chemicals: defaultChemicals.map(c => ({ ...c })),
+    notes: '',
+    photos: [],
+  });
+
+  // Derive current data from active tab
+  const currentData = applicationType === 'wicking' ? wickingData : sprayingData;
+  const setCurrentData = applicationType === 'wicking' ? setWickingData : setSprayingData;
+  const chemicals = currentData.chemicals;
+  const notes = currentData.notes;
+  const photos = currentData.photos;
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
   // Check for unusual quantities
   useEffect(() => {
+    setShowWarning(false);
     chemicals.forEach((chemical) => {
       const qty = parseFloat(chemical.quantity);
       if (chemical.name === 'Glyphosate' && qty > 100) {
@@ -58,31 +74,47 @@ export function MaterialLog() {
   }, [chemicals]);
 
   const updateChemicalQuantity = (index: number, quantity: string) => {
-    const updated = [...chemicals];
-    updated[index] = { ...updated[index], quantity };
-    setChemicals(updated);
+    setCurrentData(prev => {
+      const updated = [...prev.chemicals];
+      updated[index] = { ...updated[index], quantity };
+      return { ...prev, chemicals: updated };
+    });
   };
 
   const updateChemicalName = (index: number, name: string) => {
-    const updated = [...chemicals];
-    updated[index] = { ...updated[index], name };
-    setChemicals(updated);
+    setCurrentData(prev => {
+      const updated = [...prev.chemicals];
+      updated[index] = { ...updated[index], name };
+      return { ...prev, chemicals: updated };
+    });
   };
 
   const updateChemicalUnit = (index: number, unit: string) => {
-    const updated = [...chemicals];
-    updated[index] = { ...updated[index], unit };
-    setChemicals(updated);
+    setCurrentData(prev => {
+      const updated = [...prev.chemicals];
+      updated[index] = { ...updated[index], unit };
+      return { ...prev, chemicals: updated };
+    });
   };
 
   const addCustomChemical = () => {
-    setChemicals([...chemicals, { name: '', quantity: '', unit: 'GAL' }]);
+    setCurrentData(prev => ({
+      ...prev,
+      chemicals: [...prev.chemicals, { name: '', quantity: '', unit: 'GAL' }],
+    }));
   };
 
   const removeChemical = (index: number) => {
     if (chemicals.length > 1) {
-      setChemicals(chemicals.filter((_, i) => i !== index));
+      setCurrentData(prev => ({
+        ...prev,
+        chemicals: prev.chemicals.filter((_, i) => i !== index),
+      }));
     }
+  };
+
+  const setNotes = (value: string) => {
+    setCurrentData(prev => ({ ...prev, notes: value }));
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,14 +124,20 @@ export function MaterialLog() {
     Array.from(files).forEach((file) => {
       const reader = new FileReader();
       reader.onload = (event) => {
-        setPhotos((prev) => [...prev, event.target?.result as string]);
+        setCurrentData(prev => ({
+          ...prev,
+          photos: [...prev.photos, event.target?.result as string],
+        }));
       };
       reader.readAsDataURL(file);
     });
   };
 
   const removePhoto = (index: number) => {
-    setPhotos((prev) => prev.filter((_, i) => i !== index));
+    setCurrentData(prev => ({
+      ...prev,
+      photos: prev.photos.filter((_, i) => i !== index),
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
