@@ -176,6 +176,16 @@ export function MaterialLog() {
           </div>
         )}
 
+        {/* Project */}
+        <div className="mb-6">
+          <label className="block text-[#98989D] text-sm font-medium mb-2">
+            Project
+          </label>
+          <div className="bg-[#2C2C2E] border border-[#3A3A3C] px-4 py-3 rounded-xl">
+            <div className="text-white font-medium">{currentProject.name}</div>
+          </div>
+        </div>
+
         {/* Application Type Selector — Wicking / Spraying */}
         <div className="mb-6">
           <label className="block text-[#98989D] text-sm font-medium mb-2">
@@ -186,8 +196,8 @@ export function MaterialLog() {
               type="button"
               onClick={() => setApplicationType('wicking')}
               className={`flex-1 py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-200 ${applicationType === 'wicking'
-                  ? 'bg-[#FF6633] text-white shadow-lg shadow-[#FF6633]/25'
-                  : 'text-[#98989D] active:bg-[#3A3A3C]'
+                ? 'bg-[#FF6633] text-white shadow-lg shadow-[#FF6633]/25'
+                : 'text-[#98989D] active:bg-[#3A3A3C]'
                 }`}
             >
               <Droplets className="w-4.5 h-4.5" aria-hidden="true" />
@@ -197,23 +207,13 @@ export function MaterialLog() {
               type="button"
               onClick={() => setApplicationType('spraying')}
               className={`flex-1 py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-200 ${applicationType === 'spraying'
-                  ? 'bg-[#FF6633] text-white shadow-lg shadow-[#FF6633]/25'
-                  : 'text-[#98989D] active:bg-[#3A3A3C]'
+                ? 'bg-[#FF6633] text-white shadow-lg shadow-[#FF6633]/25'
+                : 'text-[#98989D] active:bg-[#3A3A3C]'
                 }`}
             >
               <SprayCan className="w-4.5 h-4.5" aria-hidden="true" />
               <span>Spraying</span>
             </button>
-          </div>
-        </div>
-
-        {/* Project */}
-        <div className="mb-6">
-          <label className="block text-[#98989D] text-sm font-medium mb-2">
-            Project
-          </label>
-          <div className="bg-[#2C2C2E] border border-[#3A3A3C] px-4 py-3 rounded-xl">
-            <div className="text-white font-medium">{currentProject.name}</div>
           </div>
         </div>
 
