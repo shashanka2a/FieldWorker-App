@@ -105,9 +105,9 @@ export function DailyMetrics() {
       </header>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="px-4 pt-6 pb-32 space-y-6">
+      <form onSubmit={handleSubmit} className="px-4 pt-6 pb-32">
         {/* Project */}
-        <div>
+        <div className="mb-6">
           <label className="block text-[#98989D] text-sm font-medium mb-2">
             Project
           </label>
@@ -117,10 +117,10 @@ export function DailyMetrics() {
         </div>
 
         {/* Metrics */}
-        <div className="space-y-4">
+        <div className="space-y-4 mb-6">
           <h3 className="text-white font-semibold">Daily Metrics</h3>
 
-          <div>
+          <div className="mb-4">
             <label htmlFor="waterUsage" className="block text-white text-sm font-medium mb-2">
               Water Usage (GAL) <span className="text-[#FF453A]">*</span>
             </label>
@@ -136,7 +136,7 @@ export function DailyMetrics() {
             />
           </div>
 
-          <div>
+          <div className="mb-4">
             <label htmlFor="acresCompleted" className="block text-white text-sm font-medium mb-2">
               Acres Completed <span className="text-[#FF453A]">*</span>
             </label>
@@ -152,7 +152,7 @@ export function DailyMetrics() {
             />
           </div>
 
-          <div>
+          <div className="mb-4">
             <label htmlFor="numberOfOperators" className="block text-white text-sm font-medium mb-2">
               Number of Operators <span className="text-[#FF453A]">*</span>
             </label>
@@ -170,7 +170,7 @@ export function DailyMetrics() {
         </div>
 
         {/* Notes */}
-        <div>
+        <div className="mb-6">
           <label htmlFor="notes" className="block text-white text-sm font-medium mb-2">
             Notes
           </label>
@@ -185,7 +185,7 @@ export function DailyMetrics() {
         </div>
 
         {/* Photos Section */}
-        <div>
+        <div className="mb-6">
           <label className="block text-white text-sm font-medium mb-3">
             Photos
           </label>

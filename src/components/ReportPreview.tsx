@@ -214,13 +214,26 @@ export function ReportPreview({
             {!latestChemicals || latestChemicals.chemicals.length === 0 ? (
               <p className="text-[13px] text-[#666]">—</p>
             ) : (
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[12px]">
-                {latestChemicals.chemicals.map((ch, i) => (
-                  <div key={i}>
-                    <strong>{ch.name}:</strong> {ch.quantity} {ch.unit}
+              <>
+                {latestChemicals.applicationType && (
+                  <div className="mb-3 flex items-center gap-2">
+                    <span className="text-[11px] font-bold uppercase tracking-wide text-[#666]">Application Type:</span>
+                    <span
+                      className="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wide text-white"
+                      style={{ backgroundColor: ORANGE }}
+                    >
+                      {latestChemicals.applicationType}
+                    </span>
                   </div>
-                ))}
-              </div>
+                )}
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[12px]">
+                  {latestChemicals.chemicals.map((ch, i) => (
+                    <div key={i}>
+                      <strong>{ch.name}:</strong> {ch.quantity} {ch.unit}
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>

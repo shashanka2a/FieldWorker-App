@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, Camera, X, Upload, AlertCircle, Check, Plus } from 'lucide-react';
+import { ChevronLeft, Camera, X, Upload, AlertCircle, Check, Plus, Droplets, SprayCan } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Spinner } from './ui/spinner';
 import { getReportDate, getDateKey, saveChemicals, formatReportDateLabel } from '@/lib/dailyReportStorage';
+
+type ApplicationType = 'wicking' | 'spraying';
 
 interface Chemical {
   name: string;
@@ -20,6 +22,7 @@ export function MaterialLog() {
   const [showWarning, setShowWarning] = useState(false);
   const [warningMessage, setWarningMessage] = useState('');
   const [backNavigating, setBackNavigating] = useState(false);
+  const [applicationType, setApplicationType] = useState<ApplicationType>('spraying');
 
   const currentProject = {
     name: 'North Valley Solar Farm',
@@ -111,6 +114,7 @@ export function MaterialLog() {
       id: Date.now().toString(),
       project: currentProject,
       timestamp: new Date().toISOString(),
+      applicationType,
       chemicals: usedChemicals,
       notes,
       photos,
@@ -160,10 +164,10 @@ export function MaterialLog() {
       </header>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="px-4 pt-6 pb-32 space-y-6">
+      <form onSubmit={handleSubmit} className="px-4 pt-6 pb-32">
         {/* Warning Banner */}
         {showWarning && (
-          <div className="bg-[#FF9F0A]/20 border border-[#FF9F0A] rounded-xl p-4 flex items-start gap-3">
+          <div className="bg-[#FF9F0A]/20 border border-[#FF9F0A] rounded-xl p-4 flex items-start gap-3 mb-6">
             <AlertCircle className="w-5 h-5 text-[#FF9F0A] flex-shrink-0 mt-0.5" />
             <div>
               <div className="text-[#FF9F0A] font-semibold mb-1">Warning</div>
@@ -172,8 +176,39 @@ export function MaterialLog() {
           </div>
         )}
 
+        {/* Application Type Selector — Wicking / Spraying */}
+        <div className="mb-6">
+          <label className="block text-[#98989D] text-sm font-medium mb-2">
+            Application Type
+          </label>
+          <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl p-1.5 flex gap-1.5">
+            <button
+              type="button"
+              onClick={() => setApplicationType('wicking')}
+              className={`flex-1 py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-200 ${applicationType === 'wicking'
+                  ? 'bg-[#FF6633] text-white shadow-lg shadow-[#FF6633]/25'
+                  : 'text-[#98989D] active:bg-[#3A3A3C]'
+                }`}
+            >
+              <Droplets className="w-4.5 h-4.5" aria-hidden="true" />
+              <span>Wicking</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setApplicationType('spraying')}
+              className={`flex-1 py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-200 ${applicationType === 'spraying'
+                  ? 'bg-[#FF6633] text-white shadow-lg shadow-[#FF6633]/25'
+                  : 'text-[#98989D] active:bg-[#3A3A3C]'
+                }`}
+            >
+              <SprayCan className="w-4.5 h-4.5" aria-hidden="true" />
+              <span>Spraying</span>
+            </button>
+          </div>
+        </div>
+
         {/* Project */}
-        <div>
+        <div className="mb-6">
           <label className="block text-[#98989D] text-sm font-medium mb-2">
             Project
           </label>
@@ -183,71 +218,72 @@ export function MaterialLog() {
         </div>
 
         {/* Chemicals List */}
-        <div className="space-y-3">
-          <label className="block text-white text-sm font-medium mb-2">
+        <div className="mb-6">
+          <label className="block text-white text-sm font-medium mb-3">
             Chemicals Left
           </label>
-
-          {chemicals.map((chemical, index) => (
-            <div key={index} className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl p-4">
-              <div className="flex items-start gap-3">
-                <div className="flex-1 space-y-2">
-                  {index >= 6 ? (
-                    <input
-                      type="text"
-                      value={chemical.name}
-                      onChange={(e) => updateChemicalName(index, e.target.value)}
-                      placeholder="Chemical name"
-                      className="w-full bg-[#1C1C1E] text-white placeholder-[#98989D] px-3 py-2.5 rounded-lg outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633]"
-                    />
-                  ) : (
-                    <div className="text-white font-medium">{chemical.name}</div>
-                  )}
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={chemical.quantity}
-                      onChange={(e) => updateChemicalQuantity(index, e.target.value)}
-                      placeholder="0.0"
-                      className="flex-1 bg-[#1C1C1E] text-white placeholder-[#98989D] px-3 py-2.5 rounded-lg outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633]"
-                    />
+          <div className="space-y-3">
+            {chemicals.map((chemical, index) => (
+              <div key={index} className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex-1 space-y-2">
                     {index >= 6 ? (
-                      <select
-                        value={chemical.unit}
-                        onChange={(e) => updateChemicalUnit(index, e.target.value)}
-                        className="bg-[#1C1C1E] text-white px-4 py-2.5 rounded-lg border border-[#3A3A3C] font-medium focus:ring-2 focus:ring-[#FF6633]"
-                      >
-                        <option value="GAL">GAL</option>
-                        <option value="oz">oz</option>
-                        <option value="lbs">lbs</option>
-                      </select>
+                      <input
+                        type="text"
+                        value={chemical.name}
+                        onChange={(e) => updateChemicalName(index, e.target.value)}
+                        placeholder="Chemical name"
+                        className="w-full bg-[#1C1C1E] text-white placeholder-[#98989D] px-3 py-2.5 rounded-lg outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633]"
+                      />
                     ) : (
-                      <div className="bg-[#1C1C1E] text-[#98989D] px-4 py-2.5 rounded-lg border border-[#3A3A3C] font-medium min-w-[60px] text-center">
-                        {chemical.unit}
-                      </div>
+                      <div className="text-white font-medium">{chemical.name}</div>
                     )}
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        step="0.1"
+                        value={chemical.quantity}
+                        onChange={(e) => updateChemicalQuantity(index, e.target.value)}
+                        placeholder="0.0"
+                        className="flex-1 bg-[#1C1C1E] text-white placeholder-[#98989D] px-3 py-2.5 rounded-lg outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633]"
+                      />
+                      {index >= 6 ? (
+                        <select
+                          value={chemical.unit}
+                          onChange={(e) => updateChemicalUnit(index, e.target.value)}
+                          className="bg-[#1C1C1E] text-white px-4 py-2.5 rounded-lg border border-[#3A3A3C] font-medium focus:ring-2 focus:ring-[#FF6633]"
+                        >
+                          <option value="GAL">GAL</option>
+                          <option value="oz">oz</option>
+                          <option value="lbs">lbs</option>
+                        </select>
+                      ) : (
+                        <div className="bg-[#1C1C1E] text-[#98989D] px-4 py-2.5 rounded-lg border border-[#3A3A3C] font-medium min-w-[60px] text-center">
+                          {chemical.unit}
+                        </div>
+                      )}
+                    </div>
                   </div>
+                  {index >= 6 && (
+                    <button
+                      type="button"
+                      onClick={() => removeChemical(index)}
+                      className="w-7 h-7 bg-[#FF453A] rounded-full flex items-center justify-center touch-manipulation shadow-lg flex-shrink-0"
+                      aria-label="Remove custom chemical"
+                    >
+                      <X className="w-4 h-4 text-white" />
+                    </button>
+                  )}
                 </div>
-                {index >= 6 && (
-                  <button
-                    type="button"
-                    onClick={() => removeChemical(index)}
-                    className="w-7 h-7 bg-[#FF453A] rounded-full flex items-center justify-center touch-manipulation shadow-lg flex-shrink-0"
-                    aria-label="Remove custom chemical"
-                  >
-                    <X className="w-4 h-4 text-white" />
-                  </button>
-                )}
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
 
           {/* Add Custom Chemical Button */}
           <button
             type="button"
             onClick={addCustomChemical}
-            className="w-full bg-[#2C2C2E] border-2 border-dashed border-[#FF6633] text-[#FF6633] py-3 rounded-xl flex items-center justify-center gap-2 active:bg-[#3A3A3C] transition-colors touch-manipulation"
+            className="w-full bg-[#2C2C2E] border-2 border-dashed border-[#FF6633] text-[#FF6633] py-3 rounded-xl flex items-center justify-center gap-2 active:bg-[#3A3A3C] transition-colors touch-manipulation mt-3"
           >
             <Plus className="w-5 h-5" aria-hidden="true" />
             <span className="font-medium">Add Custom Chemical</span>
@@ -255,7 +291,7 @@ export function MaterialLog() {
         </div>
 
         {/* Notes */}
-        <div>
+        <div className="mb-6">
           <label htmlFor="notes" className="block text-white text-sm font-medium mb-2">
             Notes
           </label>
@@ -270,7 +306,7 @@ export function MaterialLog() {
         </div>
 
         {/* Photos Section */}
-        <div>
+        <div className="mb-6">
           <label className="block text-white text-sm font-medium mb-3">
             Photos
           </label>

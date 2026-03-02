@@ -105,9 +105,9 @@ export function Survey() {
       </header>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="px-4 pt-6 pb-32 space-y-6">
+      <form onSubmit={handleSubmit} className="px-4 pt-6 pb-32">
         {/* Project */}
-        <div>
+        <div className="mb-6">
           <label className="block text-[#98989D] text-sm font-medium mb-2">
             Project
           </label>
@@ -118,7 +118,7 @@ export function Survey() {
 
         {/* Survey Questions */}
         {questions.map(q => (
-          <div key={q.id} className="space-y-4">
+          <div key={q.id} className="space-y-4 mb-6">
             <h3 className="text-white font-semibold">{q.question}</h3>
 
             <div className="flex gap-3">

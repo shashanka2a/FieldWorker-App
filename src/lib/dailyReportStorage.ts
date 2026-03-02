@@ -45,6 +45,7 @@ export interface ChemicalEntry {
   id: string;
   project: { name: string };
   timestamp: string;
+  applicationType?: 'wicking' | 'spraying';
   chemicals: { name: string; quantity: string; unit: string }[];
   notes?: string;
   photos?: string[];

@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, Upload, X, FileText, Image as ImageIcon } from 'lucide-react';
+import { ChevronLeft, Upload, X, FileText, Image as ImageIcon, Camera } from 'lucide-react';
 import { BottomNav } from './BottomNav';
 import { Spinner } from './ui/spinner';
 import { getReportDate, getDateKey, saveAttachments, formatReportDateLabel } from '@/lib/dailyReportStorage';
@@ -19,6 +19,7 @@ export function SubmitAttachments() {
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -47,6 +48,9 @@ export function SubmitAttachments() {
     if (newFiles.length > 0) {
       setUploadedFiles(prev => [...prev, ...newFiles]);
     }
+
+    // Reset input so the same file can be selected again
+    e.target.value = '';
   };
 
   const handleRemoveFile = (id: string) => {
@@ -103,21 +107,35 @@ export function SubmitAttachments() {
 
       {/* Content */}
       <div className="px-4 pt-4">
-        {/* Upload Area */}
-        <div className="mb-4">
-          <label className="text-[#98989D] text-sm font-semibold mb-2 block">
-            Files
+        {/* Take Photo & Upload buttons */}
+        <div className="mb-6">
+          <label className="text-[#98989D] text-sm font-semibold mb-3 block">
+            Capture or Upload
           </label>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full bg-[#2C2C2E] border-2 border-dashed border-[#FF6633]/40 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 active:bg-[#3A3A3C] transition-colors"
-          >
-            <div className="w-16 h-16 rounded-full bg-[#FF6633]/15 flex items-center justify-center">
-              <Upload className="w-8 h-8 text-[#FF6633]" />
-            </div>
-            <div className="text-white font-medium">Tap to upload files</div>
-            <div className="text-[#98989D] text-sm">Images, PDFs, or Documents</div>
-          </button>
+          <div className="flex gap-3 mb-4">
+            <button
+              onClick={() => cameraInputRef.current?.click()}
+              className="flex-1 bg-[#FF6633] text-white py-4 rounded-2xl flex flex-col items-center justify-center gap-2 active:opacity-80 transition-opacity touch-manipulation shadow-lg shadow-[#FF6633]/20"
+            >
+              <Camera className="w-8 h-8" aria-hidden="true" />
+              <span className="font-semibold text-sm">Take Photo</span>
+            </button>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="flex-1 bg-[#2C2C2E] border-2 border-dashed border-[#FF6633]/40 text-white py-4 rounded-2xl flex flex-col items-center justify-center gap-2 active:bg-[#3A3A3C] transition-colors touch-manipulation"
+            >
+              <Upload className="w-8 h-8 text-[#FF6633]" aria-hidden="true" />
+              <span className="font-semibold text-sm text-[#FF6633]">Upload Files</span>
+            </button>
+          </div>
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
           <input
             ref={fileInputRef}
             type="file"
@@ -130,27 +148,38 @@ export function SubmitAttachments() {
 
         {/* Uploaded Files */}
         {uploadedFiles.length > 0 && (
-          <div className="mb-4">
+          <div className="mb-6">
             <label className="text-[#98989D] text-sm font-semibold mb-2 block">
               Uploaded Files ({uploadedFiles.length})
             </label>
+            <div className="grid grid-cols-3 gap-3 mb-3">
+              {uploadedFiles.filter(f => f.preview).map((fileItem) => (
+                <div key={fileItem.id} className="relative aspect-square">
+                  <img
+                    src={fileItem.preview}
+                    alt={fileItem.file.name}
+                    className="w-full h-full object-cover rounded-xl border border-[#3A3A3C]"
+                  />
+                  <button
+                    onClick={() => handleRemoveFile(fileItem.id)}
+                    className="absolute -top-2 -right-2 w-7 h-7 bg-[#FF453A] rounded-full flex items-center justify-center touch-manipulation shadow-lg"
+                    aria-label="Remove file"
+                  >
+                    <X className="w-4 h-4 text-white" />
+                  </button>
+                </div>
+              ))}
+            </div>
+            {/* Non-image files list */}
             <div className="space-y-2">
-              {uploadedFiles.map((fileItem) => (
+              {uploadedFiles.filter(f => !f.preview).map((fileItem) => (
                 <div
                   key={fileItem.id}
                   className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl p-3 flex items-center gap-3"
                 >
-                  {fileItem.preview ? (
-                    <img
-                      src={fileItem.preview}
-                      alt={fileItem.file.name}
-                      className="w-12 h-12 rounded-lg object-cover"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 rounded-lg bg-[#3A3A3C] flex items-center justify-center">
-                      {getFileIcon(fileItem.file)}
-                    </div>
-                  )}
+                  <div className="w-12 h-12 rounded-lg bg-[#3A3A3C] flex items-center justify-center">
+                    {getFileIcon(fileItem.file)}
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-white text-sm font-medium truncate">
                       {fileItem.file.name}
