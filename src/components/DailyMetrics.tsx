@@ -20,6 +20,7 @@ export function DailyMetrics() {
   // Form fields
   const [waterUsage, setWaterUsage] = useState('');
   const [acresCompleted, setAcresCompleted] = useState('');
+  const [greenSpaceCompleted, setGreenSpaceCompleted] = useState('');
   const [numberOfOperators, setNumberOfOperators] = useState('');
   const [notes, setNotes] = useState('');
 
@@ -56,6 +57,7 @@ export function DailyMetrics() {
       timestamp: new Date().toISOString(),
       waterUsage,
       acresCompleted,
+      greenSpaceCompleted,
       numberOfOperators,
       notes,
       photos,
@@ -146,6 +148,22 @@ export function DailyMetrics() {
               step="0.1"
               value={acresCompleted}
               onChange={(e) => setAcresCompleted(e.target.value)}
+              placeholder="0.0"
+              required
+              className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633]"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="greenSpaceCompleted" className="block text-white text-sm font-medium mb-2">
+              Green Space Completed <span className="text-[#FF453A]">*</span>
+            </label>
+            <input
+              id="greenSpaceCompleted"
+              type="number"
+              step="0.1"
+              value={greenSpaceCompleted}
+              onChange={(e) => setGreenSpaceCompleted(e.target.value)}
               placeholder="0.0"
               required
               className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633]"

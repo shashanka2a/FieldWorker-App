@@ -193,6 +193,10 @@ export function ReportPreview({
                   <strong>Acres Completed</strong>
                   <span>{latestMetrics.acresCompleted ?? "—"}</span>
                 </div>
+                <div className="flex justify-between border-b border-[#f5f5f5] pb-1">
+                  <strong>Green Space Completed</strong>
+                  <span>{latestMetrics.greenSpaceCompleted ?? "—"}</span>
+                </div>
                 <div className="flex justify-between">
                   <strong>Number of Operators</strong>
                   <span>{latestMetrics.numberOfOperators ?? "—"}</span>

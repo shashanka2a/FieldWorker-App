@@ -57,6 +57,7 @@ export interface MetricsEntry {
   timestamp: string;
   waterUsage?: string;
   acresCompleted?: string;
+  greenSpaceCompleted?: string;
   numberOfOperators?: string;
   notes?: string;
   photos?: string[];
