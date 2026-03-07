@@ -284,3 +284,107 @@ export function getReportForDate(date: Date, projectName: string = "North Valley
     signed: getSignedReport(dateKey),
   };
 }
+
+// --- Aggregate helpers for Day / Week / To-Date tracking ---
+
+export interface MetricsAggregate {
+  waterUsage: number;
+  acresCompleted: number;
+  greenSpaceCompleted: number;
+  numberOfOperators: number;
+}
+
+/** name → { unit, quantity } */
+export interface ChemicalAggregate {
+  [name: string]: { unit: string; quantity: number };
+}
+
+function sumMetricsForDates(dates: Date[]): MetricsAggregate {
+  const agg: MetricsAggregate = { waterUsage: 0, acresCompleted: 0, greenSpaceCompleted: 0, numberOfOperators: 0 };
+  for (const d of dates) {
+    const entries = readArray<MetricsEntry>(STORAGE_KEYS.metrics(getDateKey(d)));
+    for (const e of entries) {
+      agg.waterUsage += parseFloat(e.waterUsage || "0") || 0;
+      agg.acresCompleted += parseFloat(e.acresCompleted || "0") || 0;
+      agg.greenSpaceCompleted += parseFloat(e.greenSpaceCompleted || "0") || 0;
+      agg.numberOfOperators += parseFloat(e.numberOfOperators || "0") || 0;
+    }
+  }
+  return agg;
+}
+
+function sumChemicalsForDates(dates: Date[]): ChemicalAggregate {
+  const agg: ChemicalAggregate = {};
+  for (const d of dates) {
+    const entries = readArray<ChemicalEntry>(STORAGE_KEYS.chemicals(getDateKey(d)));
+    for (const e of entries) {
+      for (const ch of e.chemicals) {
+        const qty = parseFloat(ch.quantity || "0") || 0;
+        if (qty === 0) continue;
+        if (!agg[ch.name]) {
+          agg[ch.name] = { unit: ch.unit, quantity: 0 };
+        }
+        agg[ch.name].quantity += qty;
+      }
+    }
+  }
+  return agg;
+}
+
+/** Get the Monday of the week containing `date` */
+function getWeekStart(date: Date): Date {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? 6 : day - 1; // Monday = 0
+  d.setDate(d.getDate() - diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+/** Build a date array from `start` to `end` (inclusive) */
+function dateRange(start: Date, end: Date): Date[] {
+  const result: Date[] = [];
+  const cur = new Date(start);
+  cur.setHours(0, 0, 0, 0);
+  const endNorm = new Date(end);
+  endNorm.setHours(0, 0, 0, 0);
+  while (cur <= endNorm) {
+    result.push(new Date(cur));
+    cur.setDate(cur.getDate() + 1);
+  }
+  return result;
+}
+
+export interface ProgressTotals {
+  dayMetrics: MetricsAggregate;
+  weekMetrics: MetricsAggregate;
+  toDateMetrics: MetricsAggregate;
+  dayChemicals: ChemicalAggregate;
+  weekChemicals: ChemicalAggregate;
+  toDateChemicals: ChemicalAggregate;
+}
+
+/**
+ * Compute Day / Week / To-Date progress for a given report date.
+ * "To Date" uses all data from the past 365 days up to `date`.
+ */
+export function getProgressTotals(date: Date): ProgressTotals {
+  const dayDates = [date];
+
+  const weekStart = getWeekStart(date);
+  const weekDates = dateRange(weekStart, date);
+
+  // "To Date" — scan 365 days back
+  const toDateStart = new Date(date);
+  toDateStart.setDate(toDateStart.getDate() - 365);
+  const toDateDates = dateRange(toDateStart, date);
+
+  return {
+    dayMetrics: sumMetricsForDates(dayDates),
+    weekMetrics: sumMetricsForDates(weekDates),
+    toDateMetrics: sumMetricsForDates(toDateDates),
+    dayChemicals: sumChemicalsForDates(dayDates),
+    weekChemicals: sumChemicalsForDates(weekDates),
+    toDateChemicals: sumChemicalsForDates(toDateDates),
+  };
+}

@@ -4,7 +4,8 @@ import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, PenLine, CheckCircle2 } from "lucide-react";
 import { ReportPreview } from "@/components/ReportPreview";
-import { getReportForDate, getDateKey } from "@/lib/dailyReportStorage";
+import { getReportForDate, getDateKey, getProgressTotals } from "@/lib/dailyReportStorage";
+import type { ProgressTotals } from "@/lib/dailyReportStorage";
 
 const DEFAULT_PREPARED_BY = "Ricky Smith";
 
@@ -23,6 +24,7 @@ function ReportPreviewContent() {
   }, [dateParam]);
 
   const [data, setData] = useState<ReturnType<typeof getReportForDate> | null>(null);
+  const [progress, setProgress] = useState<ProgressTotals | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -37,6 +39,7 @@ function ReportPreviewContent() {
         return saved ? new Date(saved) : new Date();
       })();
     setData(getReportForDate(date));
+    setProgress(getProgressTotals(date));
   }, [reportDate]);
 
   useEffect(() => {
@@ -97,6 +100,7 @@ function ReportPreviewContent() {
         {data ? (
           <ReportPreview
             data={data}
+            progressTotals={progress}
             preparedBy={DEFAULT_PREPARED_BY}
             showSignatureBlock={isSigned}
             signatureDataUrl={data.signed?.signatureDataUrl ?? null}

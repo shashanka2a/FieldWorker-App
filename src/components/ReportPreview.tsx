@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import type { ReportData, EquipmentEntry, EquipmentChecklistEntry } from "@/lib/dailyReportStorage";
+import type { ReportData, EquipmentEntry, EquipmentChecklistEntry, ProgressTotals } from "@/lib/dailyReportStorage";
 import { UtilityVisionLogo } from "./UtilityVisionLogo";
 
 function formatReportDateHeader(d: Date): string {
@@ -21,8 +21,15 @@ function formatShortDate(iso: string): string {
   return `${dd}/${mm}/${yy} | ${time}`;
 }
 
+/** Format a number nicely — no trailing zeros */
+function fmtNum(n: number): string {
+  if (n === 0) return "0";
+  return Number(n.toFixed(2)).toString();
+}
+
 interface ReportPreviewProps {
   data: ReportData;
+  progressTotals?: ProgressTotals | null;
   preparedBy?: string;
   showSignatureBlock?: boolean;
   signatureDataUrl?: string | null;
@@ -56,6 +63,7 @@ const ORANGE = "#FF6633";
 
 export function ReportPreview({
   data,
+  progressTotals,
   preparedBy = "Field User",
   showSignatureBlock = false,
   signatureDataUrl = null,
@@ -172,55 +180,77 @@ export function ReportPreview({
           </div>
         </div>
 
-        {/* --- Daily Metrics --- */}
+        {/* --- Daily Metrics with Day / Week / To-Date Progress --- */}
         <div className="px-7 mt-5">
           <div
             className="py-2 px-4 text-white font-bold text-[15px] uppercase tracking-wide"
             style={{ backgroundColor: ORANGE, letterSpacing: "0.5px" }}
           >
-            Daily Metrics
+            Metrics
           </div>
-          <div className="border border-[#ddd] border-t-0 px-4 py-4">
+          <div className="border border-[#ddd] border-t-0">
             {!latestMetrics ? (
-              <p className="text-[13px] text-[#666]">—</p>
+              <p className="text-[13px] text-[#666] px-4 py-4">—</p>
             ) : (
-              <div className="space-y-2 text-[13px]">
-                <div className="flex justify-between border-b border-[#f5f5f5] pb-1">
-                  <strong>Water Usage (GAL)</strong>
-                  <span>{latestMetrics.waterUsage ?? "—"}</span>
-                </div>
-                <div className="flex justify-between border-b border-[#f5f5f5] pb-1">
-                  <strong>Acres Completed</strong>
-                  <span>{latestMetrics.acresCompleted ?? "—"}</span>
-                </div>
-                <div className="flex justify-between border-b border-[#f5f5f5] pb-1">
-                  <strong>Green Space Completed</strong>
-                  <span>{latestMetrics.greenSpaceCompleted ?? "—"}</span>
-                </div>
-                <div className="flex justify-between">
-                  <strong>Number of Operators</strong>
-                  <span>{latestMetrics.numberOfOperators ?? "—"}</span>
-                </div>
-              </div>
+              <table className="w-full border-collapse text-[12px]">
+                <thead>
+                  <tr style={{ backgroundColor: "#f5f5f5" }}>
+                    <th className="text-left py-2.5 px-3 text-[#444] font-bold border-b border-[#ddd]" />
+                    <th className="text-center py-2.5 px-3 text-[#444] font-bold border-b border-[#ddd]">Day Total</th>
+                    <th className="text-center py-2.5 px-3 text-[#444] font-bold border-b border-[#ddd]">Week Total</th>
+                    <th className="text-center py-2.5 px-3 text-[#444] font-bold border-b border-[#ddd] bg-[#f0f0f0]">Quantities to Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {([
+                    { label: "Acres", unit: "Acres", key: "acresCompleted" as const },
+                    { label: "Green Space", unit: "Acres", key: "greenSpaceCompleted" as const },
+                    { label: "Water Usage", unit: "GAL", key: "waterUsage" as const },
+                    { label: "Operators", unit: "", key: "numberOfOperators" as const },
+                  ] as const).map((row) => (
+                    <tr key={row.key} className="border-b border-[#eee]">
+                      <td className="py-3 px-3 font-medium text-[#444]">{row.label}</td>
+                      <td className="py-3 px-3 text-center">
+                        <div className="font-bold text-[14px] text-[#222]">
+                          {progressTotals ? fmtNum(progressTotals.dayMetrics[row.key]) : (latestMetrics[row.key] ?? "—")}
+                        </div>
+                        <div className="text-[10px] text-[#888] mt-0.5">{row.unit}</div>
+                      </td>
+                      <td className="py-3 px-3 text-center">
+                        <div className="font-bold text-[14px] text-[#222]">
+                          {progressTotals ? fmtNum(progressTotals.weekMetrics[row.key]) : "—"}
+                        </div>
+                        <div className="text-[10px] text-[#888] mt-0.5">{row.unit}</div>
+                      </td>
+                      <td className="py-3 px-3 text-center bg-[#fafafa]">
+                        <div className="font-bold text-[14px] text-[#222]">
+                          {progressTotals ? fmtNum(progressTotals.toDateMetrics[row.key]) : "—"}
+                        </div>
+                        <div className="text-[10px] text-[#888] mt-0.5">{row.unit}</div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </div>
         </div>
 
-        {/* --- Chemicals Left (underneath Daily Metrics) --- */}
+        {/* --- Chemicals with Day / Week / To-Date Progress --- */}
         <div className="px-7 mt-5">
           <div
             className="py-2 px-4 text-white font-bold text-[15px] uppercase tracking-wide"
             style={{ backgroundColor: ORANGE, letterSpacing: "0.5px" }}
           >
-            Chemicals Left
+            Chemicals
           </div>
-          <div className="border border-[#ddd] border-t-0 px-4 py-4">
+          <div className="border border-[#ddd] border-t-0">
             {!latestChemicals || latestChemicals.chemicals.length === 0 ? (
-              <p className="text-[13px] text-[#666]">—</p>
+              <p className="text-[13px] text-[#666] px-4 py-4">—</p>
             ) : (
               <>
                 {latestChemicals.applicationType && (
-                  <div className="mb-3 flex items-center gap-2">
+                  <div className="px-4 py-2 flex items-center gap-2 border-b border-[#eee]">
                     <span className="text-[11px] font-bold uppercase tracking-wide text-[#666]">Application Type:</span>
                     <span
                       className="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wide text-white"
@@ -230,13 +260,40 @@ export function ReportPreview({
                     </span>
                   </div>
                 )}
-                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[12px]">
-                  {latestChemicals.chemicals.map((ch, i) => (
-                    <div key={i}>
-                      <strong>{ch.name}:</strong> {ch.quantity} {ch.unit}
-                    </div>
-                  ))}
-                </div>
+                <table className="w-full border-collapse text-[12px]">
+                  <thead>
+                    <tr style={{ backgroundColor: "#f5f5f5" }}>
+                      <th className="text-left py-2.5 px-3 text-[#444] font-bold border-b border-[#ddd]" />
+                      <th className="text-center py-2.5 px-3 text-[#444] font-bold border-b border-[#ddd]">Day Total</th>
+                      <th className="text-center py-2.5 px-3 text-[#444] font-bold border-b border-[#ddd]">Week Total</th>
+                      <th className="text-center py-2.5 px-3 text-[#444] font-bold border-b border-[#ddd] bg-[#f0f0f0]">Quantities to Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {latestChemicals.chemicals.map((ch, i) => {
+                      const dayQty = progressTotals?.dayChemicals[ch.name]?.quantity ?? (parseFloat(ch.quantity || "0") || 0);
+                      const weekQty = progressTotals?.weekChemicals[ch.name]?.quantity ?? 0;
+                      const toDateQty = progressTotals?.toDateChemicals[ch.name]?.quantity ?? 0;
+                      return (
+                        <tr key={i} className="border-b border-[#eee]">
+                          <td className="py-3 px-3 font-medium text-[#444]">{ch.name}</td>
+                          <td className="py-3 px-3 text-center">
+                            <div className="font-bold text-[14px] text-[#222]">{fmtNum(dayQty)}</div>
+                            <div className="text-[10px] text-[#888] mt-0.5">{ch.unit}</div>
+                          </td>
+                          <td className="py-3 px-3 text-center">
+                            <div className="font-bold text-[14px] text-[#222]">{fmtNum(weekQty)}</div>
+                            <div className="text-[10px] text-[#888] mt-0.5">{ch.unit}</div>
+                          </td>
+                          <td className="py-3 px-3 text-center bg-[#fafafa]">
+                            <div className="font-bold text-[14px] text-[#222]">{fmtNum(toDateQty)}</div>
+                            <div className="text-[10px] text-[#888] mt-0.5">{ch.unit}</div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </>
             )}
           </div>
