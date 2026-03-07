@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from 'react';
-import { ChevronLeft, Camera, X, Upload, Check } from 'lucide-react';
+import { Camera, X, Upload, Check } from 'lucide-react';
 import { Spinner } from './ui/spinner';
 import { useRouter } from 'next/navigation';
 import { getReportDate, getDateKey, saveNotes, formatReportDateLabel } from '@/lib/dailyReportStorage';
@@ -91,25 +91,28 @@ export function Notes() {
 
   return (
     <div className="min-h-screen bg-[#1C1C1E]">
-      {/* Status Bar Spacer */}
-      <div className="h-12" />
-
-      {/* Header */}
-      <header className="px-4 py-4 mb-6 border-b border-[#3A3A3C] sticky top-0 bg-[#1C1C1E] z-10">
+      {/* Header — presented-sheet style (no top spacer) */}
+      <header className="px-4 pt-3 pb-3 border-b border-[#3A3A3C] sticky top-0 bg-[#2C2C2E] z-10">
         <div className="flex items-center justify-between">
           <button
-            onClick={() => { setCancelNavigating(true); router.push('/'); }}
+            onClick={() => { setCancelNavigating(true); router.push('/notes-list'); }}
             disabled={cancelNavigating}
-            className="flex items-center gap-2 text-[#FF6633] text-base touch-manipulation disabled:opacity-70"
+            className="text-[#FF6633] text-base font-medium touch-manipulation disabled:opacity-70 min-w-[68px] text-left"
             aria-label="Cancel and go back"
           >
-            {cancelNavigating ? <Spinner size="sm" className="border-[#FF6633] border-t-transparent" /> : <ChevronLeft className="w-5 h-5" />}
-            <span>Cancel</span>
+            {cancelNavigating ? <Spinner size="sm" className="border-[#FF6633] border-t-transparent" /> : 'Cancel'}
           </button>
-          <h2 className="absolute left-1/2 -translate-x-1/2 text-white text-base font-semibold">
+          <h2 className="text-white text-base font-semibold">
             Notes
           </h2>
-          <div className="w-20" />
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            disabled={isSubmitting || !notes.trim()}
+            className="text-[#FF6633] text-base font-semibold touch-manipulation disabled:text-[#636366] min-w-[68px] text-right transition-colors"
+          >
+            {isSubmitting ? <Spinner size="sm" className="border-[#FF6633] border-t-transparent ml-auto" /> : 'Save'}
+          </button>
         </div>
       </header>
 

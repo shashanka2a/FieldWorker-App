@@ -457,42 +457,23 @@ export function Home() {
           Reporting for: {selectedDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}
         </p>
 
-        {/* Horizontal Scrollable Calendar — weekdays only */}
-        <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl px-3 py-3">
-          <div className="flex gap-4 overflow-x-auto scrollbar-hide" style={{ scrollBehavior: 'smooth' }} ref={calendarScrollRef}>
+        {/* Horizontal Scrollable Calendar — all days including weekends */}
+        <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl px-2 py-3">
+          <div className="flex overflow-x-auto scrollbar-hide" style={{ scrollBehavior: 'smooth' }} ref={calendarScrollRef}>
             {(() => {
-              // Build a list of 14 weekdays: 7 before selected, selected, then up to 6 after
-              const weekdays: Date[] = [];
-              const cursor = new Date(selectedDate);
-              // Step back to find 7 weekdays before selected
-              let before = 0;
-              const tmp = new Date(selectedDate);
-              while (before < 7) {
-                tmp.setDate(tmp.getDate() - 1);
-                if (tmp.getDay() !== 0 && tmp.getDay() !== 6) {
-                  weekdays.unshift(new Date(tmp));
-                  before++;
-                }
-              }
-              // Add selected date if weekday
-              if (cursor.getDay() !== 0 && cursor.getDay() !== 6) {
-                weekdays.push(new Date(cursor));
-              }
-              // Add 6 weekdays after
-              const after = new Date(selectedDate);
-              let count = 0;
-              while (count < 6) {
-                after.setDate(after.getDate() + 1);
-                if (after.getDay() !== 0 && after.getDay() !== 6) {
-                  weekdays.push(new Date(after));
-                  count++;
-                }
+              // Build a list of 15 days: 7 before selected, selected, then 7 after
+              const days: Date[] = [];
+              for (let i = -7; i <= 7; i++) {
+                const d = new Date(selectedDate);
+                d.setDate(d.getDate() + i);
+                days.push(d);
               }
 
-              return weekdays.map((date, idx) => {
+              return days.map((date, idx) => {
                 const isSelectedDate = date.toDateString() === selectedDate.toDateString();
                 const isTodayDate = date.toDateString() === today.toDateString();
                 const isFutureDate = date > today;
+                const isWeekend = date.getDay() === 0 || date.getDay() === 6;
                 const dayLetter = date.toLocaleDateString('en-US', { weekday: 'short' })[0];
                 const dayNum = date.getDate();
 
@@ -507,17 +488,21 @@ export function Home() {
                       }
                     }}
                     disabled={isFutureDate}
-                    className="flex flex-col items-center gap-1.5 flex-shrink-0"
+                    className="flex flex-col items-center gap-1.5 flex-shrink-0 min-w-[44px] py-0.5"
                   >
-                    <div className={`text-[11px] font-semibold uppercase tracking-wide ${isFutureDate ? 'text-[#48484A]' : 'text-[#98989D]'
+                    <div className={`text-[11px] font-semibold uppercase tracking-wide ${isWeekend
+                        ? isFutureDate ? 'text-[#3A3A3C]' : 'text-[#636366]'
+                        : isFutureDate ? 'text-[#48484A]' : 'text-[#98989D]'
                       }`}>{dayLetter}</div>
-                    <div className={`w-9 h-9 rounded-full flex items-center justify-center font-semibold text-sm transition-colors ${isFutureDate
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-colors ${isFutureDate
                       ? 'text-[#48484A] cursor-not-allowed'
                       : isSelectedDate
                         ? 'bg-[#0A84FF] text-white'
                         : isTodayDate
                           ? 'bg-[#0A84FF]/25 text-[#0A84FF]'
-                          : 'text-white hover:bg-[#3A3A3C]'
+                          : isWeekend
+                            ? 'text-[#636366] hover:bg-[#3A3A3C]'
+                            : 'text-white hover:bg-[#3A3A3C]'
                       }`}>
                       {dayNum}
                     </div>

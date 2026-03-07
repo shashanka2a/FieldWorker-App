@@ -66,13 +66,10 @@ export function More() {
 
   return (
     <div className="min-h-screen bg-[#1C1C1E] pb-20">
-      {/* Status Bar Spacer */}
-      <div className="h-12" />
-
       {/* Header */}
-      <header className="px-4 py-6 mb-3">
-        <h1 className="text-white text-3xl font-bold mb-2">More</h1>
-        <div className="text-[#98989D] text-sm">Additional features and settings</div>
+      <header className="bg-[#2C2C2E] border-b border-[#3A3A3C] px-4 py-4 sticky top-0 z-20">
+        <h1 className="text-white text-xl font-bold">More</h1>
+        <p className="text-[#98989D] text-sm mt-1">Additional features and settings</p>
       </header>
 
       {/* Profile Section */}
