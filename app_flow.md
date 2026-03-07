@@ -1,6 +1,6 @@
 # FieldWorker App — Complete App Flow & Architecture Guide
 
-> Generated: 2026-02-25 | Stack: Next.js 15 (App Router) + TypeScript + TailwindCSS v4 + Radix UI
+> Generated: 2026-02-25 | Updated: 2026-03-07 | Stack: Next.js 15 (App Router) + TypeScript + TailwindCSS v4 + Radix UI
 
 ---
 
@@ -33,9 +33,15 @@
 │   ├── attachments-list/page.tsx # /attachments-list → <AttachmentsList />
 │   ├── checklist/page.tsx        # /checklist → <DailyChecklist />
 │   ├── gallery/page.tsx          # /gallery → <Gallery />
+│   ├── incidents/
+│   │   ├── page.tsx              # /incidents → <IncidentsList />
+│   │   └── new/page.tsx          # /incidents/new → <SubmitIncident />
 │   ├── material-log/page.tsx     # /material-log → <MaterialLog />
 │   ├── more/page.tsx             # /more → <More />
 │   ├── notes-list/page.tsx       # /notes-list → <NotesList />
+│   ├── observations/
+│   │   ├── page.tsx              # /observations → <ObservationsList />
+│   │   └── new/page.tsx          # /observations/new?category=negative|positive → <SubmitObservation />
 │   ├── projects/page.tsx         # /projects → <Projects />
 │   ├── reports/page.tsx          # /reports → <Reports /> (signed report history)
 │   ├── settings/page.tsx         # /settings → <Settings />
@@ -79,6 +85,10 @@
 │   │   ├── ActivityHistory.tsx   # Activity log feed
 │   │   ├── AttachmentsList.tsx   # Gallery of uploaded attachments
 │   │   ├── Gallery.tsx           # Full photo gallery
+│   │   ├── IncidentsList.tsx     # Incidents list (Open/Closed tabs, search)
+│   │   ├── SubmitIncident.tsx    # New incident form
+│   │   ├── ObservationsList.tsx  # Observations list (search + filter)
+│   │   ├── SubmitObservation.tsx # New/edit observation form
 │   │   ├── More.tsx              # User profile + navigation menu
 │   │   ├── ReportPreview.tsx     # Printable daily report renderer
 │   │   ├── Reports.tsx           # Signed reports history list
@@ -138,7 +148,7 @@
     - 🟢 Green dot = signed report
     - 🟡 Yellow bar = data logged, unsigned
     - 🔴 Red triangle = no data logged (missed)
-  - 3×3 grid of task tiles (tap → navigate with loading spinner)
+  - Grid of task tiles (Notes, Chemicals, Metrics, Survey, Equipment, Photos, Safety, Incidents, Observations, Report)
   - Hidden file input for quick attachment upload
 
 ### 4.2 Notes (`/notes-list` → `/submit/notes`)
@@ -152,11 +162,12 @@
 - **Pre-populated list:** 6 default chemicals (Glyphosate, Surfactant, Super Dye, 2,4-D, Ecomazapyr 2SL, Regular Dye)
 - **Validation:** Quantity threshold warnings (>100 GAL Glyphosate, >128 oz Surfactant)
 - **Custom chemicals:** Add/remove beyond the 6 defaults
+- **Application Type:** Tab selector for Wicking or Spraying; each tab stores its chemicals/notes/photos independently
 - **Save:** `saveChemicals(dateKey, entry)` → `localStorage["chemicals_YYYY-MM-DD"]`
 
 ### 4.4 Metrics (`/submit/metrics`)
 - **Component:** `DailyMetrics.tsx`
-- **Fields:** Water Usage (GAL), Acres Completed, Number of Operators, Notes, Photos
+- **Fields:** Water Usage (GAL), Acres Completed, Green Space Completed, Number of Operators, Notes, Photos
 - **Save:** `saveMetrics(dateKey, entry)` → `localStorage["metrics_YYYY-MM-DD"]`
 
 ### 4.5 Survey (`/submit/survey`)
@@ -189,18 +200,35 @@
 - **Templates (static):** AED Safety Talk, Slips Trips & Falls, PPE
 - **Save:** `addScheduledSafetyTalk()` / `updateScheduledSafetyTalk()` / `deleteScheduledSafetyTalk()` → `localStorage["safety_talks"]`
 
-### 4.9 Daily Report (`/report/preview`, `/report/sign`)
+### 4.9 Incidents (`/incidents`, `/incidents/new`)
+- **IncidentsList.tsx**: Incidents list with Open/Closed tab selector, search bar, incident cards showing title/location/date/status badges
+- **Empty state:** Hard hat icon with helper text
+- **Create:** FAB (+) → `/incidents/new`
+- **SubmitIncident.tsx**: Form with Title, Status (Open/Closed toggle), Recordable (iOS-style switch), Incident Date/Time, Location, Injury/illness type, Employee Info, Investigation, Outcome text areas, Camera + Upload photos
+- **Save:** `saveIncident(dateKey, entry)` → `localStorage["incidents_YYYY-MM-DD"]`
+- **Report:** Only included in report preview if incident data exists
+
+### 4.10 Observations (`/observations`, `/observations/new`)
+- **ObservationsList.tsx**: Observations list with search bar + filter icon, observation cards showing type/status/date/assignee
+- **Empty state:** Eye icon with helper text
+- **Create:** FAB (+) → iOS-style bottom action sheet with "Negative observation" / "Positive observation" → `/observations/new?category=negative|positive`
+- **SubmitObservation.tsx**: Form with Attachments (camera), Category badge (Negative red / Positive green), Type picker (9 options: Hazardous Materials, PPE Violation, etc.), Status (Open/Closed), Priority (Low/Medium/High/Critical colored dots), MORE INFO toggle (description), Assignees section, Due Date, Resolution Photos, Team Member Notifications
+- **Save:** `saveObservation(dateKey, entry)` → `localStorage["observations_YYYY-MM-DD"]`
+- **Report:** Only included in report preview if observation data exists
+
+### 4.11 Daily Report (`/report/preview`, `/report/sign`)
 - **ReportPreview.tsx**: Printable report document (white paper on grey bg)
-  - Sections: Date/Job header, Weather (placeholder —), General Notes, Daily Metrics, Chemicals Left, Equipment Checklist, Site Photos (aggregated from all entries), Survey table, Signature block
+  - Sections: Date/Job header, Weather (placeholder —), General Notes, Metrics (Day/Week/To-Date table), Chemicals (Day/Week/To-Date table), Incidents (conditional), Observations (conditional), Equipment Checklist, Site Photos, Survey table, Signature block
+  - **Progress Tracking:** Metrics and Chemicals sections display Day Total, Week Total, and Quantities to Date columns using aggregated data from `getProgressTotals()`
 - **Signing:** `/report/sign` → full-name input + canvas signature → `saveSignedReport(dateKey, entry)` → `localStorage["report_signed_YYYY-MM-DD"]`
 - **After signing:** Calendar shows green dot; report becomes read-only
 
-### 4.10 Activity (`/activity`)
+### 4.12 Activity (`/activity`)
 - **Component:** `ActivityHistory.tsx`
 - **Status:** UI shell only — `activities` array is always empty (no data loading implemented yet)
 - **Filters:** All / Today / This Week
 
-### 4.11 More (`/more`)
+### 4.13 More (`/more`)
 - **Component:** `More.tsx`
 - **User:** Hardcoded (Ricky Smith, Field Supervisor)
 - **Links:** Reports, Gallery, Projects, Settings
@@ -221,6 +249,8 @@ All data is keyed by `YYYY-MM-DD` date strings.
 "equipment_YYYY-MM-DD"    → (EquipmentEntry | EquipmentChecklistEntry)[]
 "material_YYYY-MM-DD"     → MaterialEntry[]
 "attachments_YYYY-MM-DD"  → AttachmentEntry[]
+"incidents_YYYY-MM-DD"    → IncidentEntry[]
+"observations_YYYY-MM-DD" → ObservationEntry[]
 "report_signed_YYYY-MM-DD"→ SignedReportEntry (object, not array)
 
 // Global keys:
@@ -232,13 +262,20 @@ All data is keyed by `YYYY-MM-DD` date strings.
 ### Key Data Types
 ```typescript
 interface NoteEntry      { id, project, timestamp, category, notes, photos? }
-interface ChemicalEntry  { id, project, timestamp, chemicals[{name,qty,unit}], notes?, photos? }
-interface MetricsEntry   { id, project, timestamp, waterUsage?, acresCompleted?, numberOfOperators?, notes?, photos? }
+interface ChemicalEntry  { id, project, timestamp, applicationType?('wicking'|'spraying'), chemicals[{name,qty,unit}], notes?, photos? }
+interface MetricsEntry   { id, project, timestamp, waterUsage?, acresCompleted?, greenSpaceCompleted?, numberOfOperators?, notes?, photos? }
 interface SurveyEntry    { id, project, timestamp, questions[{id,question,answer,description}] }
 interface EquipmentChecklistEntry { id, type:"checklist", timestamp, formData{...}, signature?, photos? }
 interface AttachmentEntry{ id, project, timestamp, fileNames[], notes?, previews? }
+interface IncidentEntry  { id, project, timestamp, title, status('open'|'closed'), recordable, incidentDate, incidentTime, location, injuryType, employeeInfo, investigation, outcome, photos? }
+interface ObservationEntry { id, project, timestamp, category('negative'|'positive'), type, status('open'|'closed'), priority('low'|'medium'|'high'|'critical'), description, assignee, dueDate, resolution, resolutionPhotos?, photos? }
 interface SignedReportEntry { signedAt, preparedBy, signatureDataUrl, projectName }
 interface SafetyTalk     { id, templateId, templateName, date(YYYY-MM-DD), status, createdAt }
+
+// Aggregate types for progress tracking:
+interface MetricsAggregate  { waterUsage, acresCompleted, greenSpaceCompleted, numberOfOperators }
+interface ChemicalAggregate { [name]: { unit, quantity } }
+interface ProgressTotals    { dayMetrics, weekMetrics, toDateMetrics, dayChemicals, weekChemicals, toDateChemicals }
 ```
 
 ---
@@ -301,6 +338,11 @@ src/lib/api/
 | `saveEquipmentChecklist(dateKey, entry)` | `POST /api/reports/{date}/equipment` |
 | `saveMaterial(dateKey, entry)` | `POST /api/reports/{date}/materials` |
 | `saveAttachments(dateKey, entry)` | `POST /api/reports/{date}/attachments` (multipart) |
+| `saveIncident(dateKey, entry)` | `POST /api/reports/{date}/incidents` |
+| `getIncidents(dateKey)` | `GET /api/reports/{date}/incidents` |
+| `saveObservation(dateKey, entry)` | `POST /api/reports/{date}/observations` |
+| `getObservations(dateKey)` | `GET /api/reports/{date}/observations` |
+| `getProgressTotals(date)` | `GET /api/reports/{date}/progress` |
 | `saveSignedReport(dateKey, entry)` | `POST /api/reports/{date}/sign` |
 | `getReportForDate(date)` | `GET /api/reports/{date}` |
 | `getSignedReportDateKeys()` | `GET /api/reports/signed-dates` |
@@ -341,6 +383,9 @@ app/api/
 │   │   ├── equipment/route.ts    # GET, POST
 │   │   ├── materials/route.ts    # GET, POST
 │   │   ├── attachments/route.ts  # GET, POST (multipart upload)
+│   │   ├── incidents/route.ts    # GET, POST
+│   │   ├── observations/route.ts # GET, POST
+│   │   ├── progress/route.ts     # GET (day/week/to-date aggregates)
 │   │   └── sign/route.ts         # POST (sign report)
 │   └── signed-dates/route.ts     # GET list of signed dates
 ├── safety-talks/
@@ -423,8 +468,12 @@ const handleSubmit = async (e: React.FormEvent) => {
 | `Survey.tsx` | `saveSurvey()` |
 | `DailyChecklist.tsx` | `saveEquipmentChecklist()` |
 | `SubmitAttachments.tsx` | `saveAttachments()` |
+| `SubmitIncident.tsx` | `saveIncident()` |
+| `SubmitObservation.tsx` | `saveObservation()` |
 | `SubmitForm.tsx` | `saveMaterial()`, `saveEquipment()` |
 | `Home.tsx` | `getReportForDate()`, `getSignedReport()` (for calendar indicators) |
+| `IncidentsList.tsx` | `getIncidents()` |
+| `ObservationsList.tsx` | `getObservations()` |
 | `NotesList.tsx` | read array from localStorage |
 | `AttachmentsList.tsx` | read array from localStorage |
 | `Reports.tsx` | `getSignedReportDateKeys()`, `getSignedReport()` |
