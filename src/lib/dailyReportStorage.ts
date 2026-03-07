@@ -118,6 +118,23 @@ export interface EquipmentChecklistEntry {
 
 export type EquipmentOrChecklistEntry = EquipmentEntry | EquipmentChecklistEntry;
 
+export interface IncidentEntry {
+  id: string;
+  project: { name: string };
+  timestamp: string;
+  title: string;
+  status: 'open' | 'closed';
+  recordable: boolean;
+  incidentDate: string;
+  incidentTime: string;
+  location: string;
+  injuryType: string;
+  employeeInfo: string;
+  investigation: string;
+  outcome: string;
+  photos?: string[];
+}
+
 export interface SignedReportEntry {
   signedAt: string;
   preparedBy: string;
@@ -135,6 +152,7 @@ const STORAGE_KEYS = {
   equipment: (d: string) => `equipment_${d}`,
   material: (d: string) => `material_${d}`,
   attachments: (d: string) => `attachments_${d}`,
+  incidents: (d: string) => `incidents_${d}`,
   signed: (d: string) => `report_signed_${d}`,
 } as const;
 
@@ -188,6 +206,24 @@ export function saveMaterial(dateKey: string, entry: MaterialEntry): void {
 
 export function saveAttachments(dateKey: string, entry: AttachmentEntry): void {
   appendEntry(STORAGE_KEYS.attachments, dateKey, entry);
+}
+
+export function saveIncident(dateKey: string, entry: IncidentEntry): void {
+  appendEntry(STORAGE_KEYS.incidents, dateKey, entry);
+}
+
+export function getIncidents(dateKey: string): IncidentEntry[] {
+  return readArray<IncidentEntry>(STORAGE_KEYS.incidents(dateKey));
+}
+
+export function updateIncident(dateKey: string, updatedEntry: IncidentEntry): void {
+  const key = STORAGE_KEYS.incidents(dateKey);
+  const arr = readArray<IncidentEntry>(key);
+  const idx = arr.findIndex(e => e.id === updatedEntry.id);
+  if (idx !== -1) {
+    arr[idx] = updatedEntry;
+    writeArray(key, arr);
+  }
 }
 
 export function saveEquipmentChecklist(dateKey: string, entry: EquipmentChecklistEntry): void {
@@ -265,6 +301,7 @@ export interface ReportData {
   survey: SurveyEntry[];
   equipment: EquipmentOrChecklistEntry[];
   attachments: AttachmentEntry[];
+  incidents: IncidentEntry[];
   signed: SignedReportEntry | null;
 }
 
@@ -281,6 +318,7 @@ export function getReportForDate(date: Date, projectName: string = "North Valley
     survey: readArray<SurveyEntry>(STORAGE_KEYS.survey(dateKey)),
     equipment: readArray<EquipmentOrChecklistEntry>(STORAGE_KEYS.equipment(dateKey)),
     attachments: readArray<AttachmentEntry>(STORAGE_KEYS.attachments(dateKey)),
+    incidents: readArray<IncidentEntry>(STORAGE_KEYS.incidents(dateKey)),
     signed: getSignedReport(dateKey),
   };
 }

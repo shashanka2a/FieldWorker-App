@@ -271,6 +271,22 @@ export function Home() {
       ),
     },
     {
+      id: 'incidents',
+      name: 'Incidents',
+      route: '/incidents',
+      svg: (
+        <svg width="100%" height="100%" viewBox="0 0 34 34" fill="none">
+          {/* Hard hat shape */}
+          <path d="M7 22h20v2a3 3 0 01-3 3H10a3 3 0 01-3-3v-2z" fill="#FF6633" opacity="0.3" />
+          <path d="M8 22c0-7 3.5-12 9-12s9 5 9 12" stroke="#FF6633" strokeWidth="2" strokeLinecap="round" />
+          <line x1="6" y1="22" x2="28" y2="22" stroke="#FF6633" strokeWidth="2" strokeLinecap="round" />
+          {/* Exclamation mark */}
+          <circle cx="17" cy="16" r="1.5" fill="#FF6633" />
+          <line x1="17" y1="10" x2="17" y2="14" stroke="#FF6633" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+      ),
+    },
+    {
       id: 'report',
       name: 'Report',
       route: '/report/preview',
@@ -297,7 +313,7 @@ export function Home() {
   const hasDataForSelectedDate = () => {
     if (typeof window === 'undefined') return false;
     const dateKey = getDateKey(selectedDate);
-    const dataTypes = ['notes', 'chemicals', 'metrics', 'survey', 'equipment', 'attachments', 'material'];
+    const dataTypes = ['notes', 'chemicals', 'metrics', 'survey', 'equipment', 'attachments', 'material', 'incidents'];
 
     return dataTypes.some(type => {
       const key = `${type}_${dateKey}`;
@@ -476,12 +492,12 @@ export function Home() {
                     <div className={`text-[11px] font-semibold uppercase tracking-wide ${isFutureDate ? 'text-[#48484A]' : 'text-[#98989D]'
                       }`}>{dayLetter}</div>
                     <div className={`w-9 h-9 rounded-full flex items-center justify-center font-semibold text-sm transition-colors ${isFutureDate
-                        ? 'text-[#48484A] cursor-not-allowed'
-                        : isSelectedDate
-                          ? 'bg-[#0A84FF] text-white'
-                          : isTodayDate
-                            ? 'bg-[#0A84FF]/25 text-[#0A84FF]'
-                            : 'text-white hover:bg-[#3A3A3C]'
+                      ? 'text-[#48484A] cursor-not-allowed'
+                      : isSelectedDate
+                        ? 'bg-[#0A84FF] text-white'
+                        : isTodayDate
+                          ? 'bg-[#0A84FF]/25 text-[#0A84FF]'
+                          : 'text-white hover:bg-[#3A3A3C]'
                       }`}>
                       {dayNum}
                     </div>

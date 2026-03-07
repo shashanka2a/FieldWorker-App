@@ -299,6 +299,65 @@ export function ReportPreview({
           </div>
         </div>
 
+        {/* --- Incidents (only if logged) --- */}
+        {data.incidents && data.incidents.length > 0 && (
+          <div className="px-7 mt-5">
+            <div
+              className="py-2 px-4 text-white font-bold text-[15px] uppercase tracking-wide"
+              style={{ backgroundColor: ORANGE, letterSpacing: "0.5px" }}
+            >
+              Incidents
+            </div>
+            <div className="border border-[#ddd] border-t-0 px-4 py-4">
+              <div className="space-y-4">
+                {data.incidents.map((inc, idx) => (
+                  <div key={inc.id} className={idx > 0 ? "border-t border-[#eee] pt-4" : ""}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <strong className="text-[13px] text-[#222]">{inc.title || "Untitled Incident"}</strong>
+                      <span
+                        className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded"
+                        style={{
+                          backgroundColor: inc.status === "open" ? "#FFF3E0" : "#E8F5E9",
+                          color: inc.status === "open" ? "#E65100" : "#2E7D32",
+                        }}
+                      >
+                        {inc.status}
+                      </span>
+                      {inc.recordable && (
+                        <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded" style={{ backgroundColor: "#FFEBEE", color: "#C62828" }}>
+                          Recordable
+                        </span>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[12px]">
+                      <div><strong>Date:</strong> {inc.incidentDate}</div>
+                      <div><strong>Time:</strong> {inc.incidentTime}</div>
+                      {inc.location && <div className="col-span-2"><strong>Location:</strong> {inc.location}</div>}
+                      {inc.injuryType && <div className="col-span-2"><strong>Injury Type:</strong> {inc.injuryType}</div>}
+                    </div>
+                    {inc.employeeInfo && (
+                      <div className="mt-2 text-[12px]"><strong>Employee Info:</strong> {inc.employeeInfo}</div>
+                    )}
+                    {inc.investigation && (
+                      <div className="mt-1 text-[12px]"><strong>Investigation:</strong> {inc.investigation}</div>
+                    )}
+                    {inc.outcome && (
+                      <div className="mt-1 text-[12px]"><strong>Outcome:</strong> {inc.outcome}</div>
+                    )}
+                    {(inc.photos ?? []).length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {(inc.photos ?? []).map((src, j) => (
+                          <img key={j} src={src} alt="" className="w-16 h-16 object-cover border border-[#ddd]" />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* --- Equipment Checklist --- */}
         <div className="px-7 mt-8">
           <div
