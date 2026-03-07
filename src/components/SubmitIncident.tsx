@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, ChevronRight, Calendar, Clock, MapPin, X, Camera, Upload } from 'lucide-react';
+import { ChevronLeft, Camera, Upload, X, Check, AlertTriangle } from 'lucide-react';
 import { Spinner } from './ui/spinner';
 import { getReportDate, getDateKey, saveIncident, formatReportDateLabel } from '@/lib/dailyReportStorage';
 
@@ -15,7 +15,7 @@ export function SubmitIncident() {
     const now = new Date();
     const [incidentDate, setIncidentDate] = useState(now.toISOString().split('T')[0]);
     const [incidentTime, setIncidentTime] = useState(
-        now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+        now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).slice(0, 5)
     );
     const [location, setLocation] = useState('');
     const [injuryType, setInjuryType] = useState('');
@@ -24,6 +24,8 @@ export function SubmitIncident() {
     const [outcome, setOutcome] = useState('');
     const [photos, setPhotos] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [cancelNavigating, setCancelNavigating] = useState(false);
 
     const cameraInputRef = useRef<HTMLInputElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -45,12 +47,18 @@ export function SubmitIncident() {
         setPhotos((prev) => prev.filter((_, i) => i !== index));
     };
 
-    const handleSave = async () => {
+    const formatDateDisplay = (dateStr: string) => {
+        if (!dateStr) return '—';
+        const d = new Date(dateStr + 'T00:00:00');
+        return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    };
+
+    const handleSubmit = async (e?: React.FormEvent) => {
+        e?.preventDefault();
         setIsSubmitting(true);
+
         const date = getReportDate();
         const dateKey = getDateKey(date);
-
-        const formattedDate = incidentDate || new Date().toISOString().split('T')[0];
 
         saveIncident(dateKey, {
             id: Date.now().toString(),
@@ -59,7 +67,7 @@ export function SubmitIncident() {
             title,
             status,
             recordable,
-            incidentDate: formattedDate,
+            incidentDate: incidentDate || new Date().toISOString().split('T')[0],
             incidentTime,
             location,
             injuryType,
@@ -69,236 +77,279 @@ export function SubmitIncident() {
             photos: photos.length > 0 ? photos : undefined,
         });
 
-        await new Promise(resolve => setTimeout(resolve, 600));
-        router.push('/incidents');
+        await new Promise(resolve => setTimeout(resolve, 800));
+        setIsSubmitting(false);
+        setShowSuccess(true);
+        setTimeout(() => router.push('/incidents'), 1200);
     };
 
-    const formatDateDisplay = (dateStr: string) => {
-        if (!dateStr) return '—';
-        const d = new Date(dateStr + 'T00:00:00');
-        return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-    };
+    if (showSuccess) {
+        return (
+            <div className="min-h-screen bg-[#1C1C1E] flex items-center justify-center px-4">
+                <div className="text-center">
+                    <div className="w-20 h-20 bg-[#FF6633]/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Check className="w-10 h-10 text-[#FF6633]" aria-hidden="true" />
+                    </div>
+                    <h2 className="text-white text-2xl font-semibold mb-2">Submitted!</h2>
+                    <p className="text-[#98989D]">Your incident has been saved</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="min-h-screen bg-[#1C1C1E] pb-20">
+        <div className="min-h-screen bg-[#1C1C1E]">
+            {/* Status Bar Spacer */}
+            <div className="h-12" />
+
             {/* Header */}
-            <header className="bg-[#2C2C2E] border-b border-[#3A3A3C] px-4 py-4 sticky top-0 z-20">
+            <header className="px-4 py-4 mb-6 border-b border-[#3A3A3C] sticky top-0 bg-[#1C1C1E] z-10">
                 <div className="flex items-center justify-between">
                     <button
-                        onClick={() => router.push('/incidents')}
-                        className="text-[#0A84FF] text-base font-medium active:opacity-60"
+                        onClick={() => { setCancelNavigating(true); router.push('/incidents'); }}
+                        disabled={cancelNavigating}
+                        className="flex items-center gap-2 text-[#FF6633] text-base touch-manipulation disabled:opacity-70"
+                        aria-label="Cancel and go back"
                     >
-                        Cancel
+                        {cancelNavigating ? <Spinner size="sm" className="border-[#FF6633] border-t-transparent" /> : <ChevronLeft className="w-5 h-5" />}
+                        <span>Cancel</span>
                     </button>
-                    <h1 className="text-white text-lg font-bold">New incident</h1>
-                    <button
-                        onClick={handleSave}
-                        disabled={isSubmitting}
-                        className="text-[#636366] text-base font-medium disabled:opacity-50 active:opacity-60"
-                    >
-                        {isSubmitting ? <Spinner size="sm" className="border-[#636366] border-t-transparent" /> : 'Save'}
-                    </button>
+                    <h2 className="absolute left-1/2 -translate-x-1/2 text-white text-base font-semibold">
+                        New Incident
+                    </h2>
+                    <div className="w-20" />
                 </div>
             </header>
 
-            <div className="px-4 pt-4">
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="px-4 pb-32 space-y-6">
                 {/* Title */}
-                <div className="mb-0 border-b border-[#3A3A3C] py-4">
+                <div>
+                    <label htmlFor="title" className="block text-white text-sm font-medium mb-2">
+                        Title <span className="text-[#FF453A]">*</span>
+                    </label>
                     <input
+                        id="title"
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        placeholder="Title"
-                        className="w-full bg-transparent text-white placeholder-[#98989D] text-base outline-none"
+                        placeholder="Incident title"
+                        required
+                        className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633]"
                     />
                 </div>
 
-                {/* Status */}
-                <button
-                    onClick={() => setStatus(status === 'open' ? 'closed' : 'open')}
-                    className="w-full flex items-center justify-between border-b border-[#3A3A3C] py-4 active:bg-[#2C2C2E] transition-colors"
-                >
+                {/* Status & Recordable row */}
+                <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <div className="text-[#98989D] text-xs mb-0.5">Status</div>
-                        <div className="text-white text-base font-medium capitalize">{status}</div>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-[#636366]" />
-                </button>
-
-                {/* Recordable */}
-                <div className="flex items-start justify-between border-b border-[#3A3A3C] py-4">
-                    <div className="flex-1 pr-4">
-                        <div className="text-white text-base font-semibold mb-1">Recordable</div>
-                        <div className="text-[#98989D] text-sm leading-snug">
-                            Switch on if this incident is classified as a recordable by your regulatory agency
+                        <label className="block text-white text-sm font-medium mb-2">Status</label>
+                        <div className="flex bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl overflow-hidden">
+                            <button
+                                type="button"
+                                onClick={() => setStatus('open')}
+                                className={`flex-1 py-3 text-sm font-semibold transition-all ${status === 'open' ? 'bg-[#FF6633] text-white' : 'text-[#98989D]'
+                                    }`}
+                            >
+                                Open
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setStatus('closed')}
+                                className={`flex-1 py-3 text-sm font-semibold transition-all ${status === 'closed' ? 'bg-[#30D158] text-white' : 'text-[#98989D]'
+                                    }`}
+                            >
+                                Closed
+                            </button>
                         </div>
                     </div>
-                    <button
-                        onClick={() => setRecordable(!recordable)}
-                        className={`w-[51px] h-[31px] rounded-full p-[2px] transition-colors duration-200 shrink-0 ${recordable ? 'bg-[#30D158]' : 'bg-[#636366]'
-                            }`}
-                    >
-                        <div
-                            className={`w-[27px] h-[27px] bg-white rounded-full shadow transition-transform duration-200 ${recordable ? 'translate-x-[20px]' : 'translate-x-0'
+                    <div>
+                        <label className="block text-white text-sm font-medium mb-2">Recordable</label>
+                        <button
+                            type="button"
+                            onClick={() => setRecordable(!recordable)}
+                            className={`w-full py-3 rounded-xl text-sm font-semibold border transition-all ${recordable
+                                    ? 'bg-[#FF453A]/15 border-[#FF453A] text-[#FF453A]'
+                                    : 'bg-[#2C2C2E] border-[#3A3A3C] text-[#98989D]'
                                 }`}
-                        />
-                    </button>
-                </div>
-
-                {/* Incident details heading */}
-                <div className="pt-8 pb-4">
-                    <h2 className="text-[#0A84FF] text-xl font-semibold">Incident details</h2>
-                </div>
-
-                {/* Incident Date */}
-                <div className="flex items-center justify-between border-b border-[#3A3A3C] py-4">
-                    <div className="flex-1">
-                        <div className="text-[#98989D] text-xs mb-0.5">Incident Date</div>
-                        <div className="text-white text-base font-medium">{formatDateDisplay(incidentDate)}</div>
-                    </div>
-                    <label className="w-10 h-10 rounded-lg bg-[#3A3A3C] flex items-center justify-center cursor-pointer">
-                        <Calendar className="w-5 h-5 text-[#98989D]" />
-                        <input
-                            type="date"
-                            value={incidentDate}
-                            onChange={(e) => setIncidentDate(e.target.value)}
-                            className="sr-only"
-                        />
-                    </label>
-                </div>
-
-                {/* Incident Time */}
-                <div className="flex items-center justify-between border-b border-[#3A3A3C] py-4">
-                    <div className="flex-1">
-                        <div className="text-[#98989D] text-xs mb-0.5">Incident Time</div>
-                        <input
-                            type="time"
-                            value={incidentTime}
-                            onChange={(e) => setIncidentTime(e.target.value)}
-                            className="bg-transparent text-white text-base font-medium outline-none"
-                        />
-                    </div>
-                    <div className="w-10 h-10 rounded-lg bg-[#3A3A3C] flex items-center justify-center">
-                        <Clock className="w-5 h-5 text-[#98989D]" />
-                    </div>
-                </div>
-
-                {/* Location */}
-                <div className="flex items-center justify-between border-b border-[#3A3A3C] py-4">
-                    <div className="flex-1 pr-3">
-                        <div className="text-[#98989D] text-xs mb-0.5">Incident location</div>
-                        <input
-                            type="text"
-                            value={location}
-                            onChange={(e) => setLocation(e.target.value)}
-                            placeholder="Enter location"
-                            className="w-full bg-transparent text-white placeholder-[#636366] text-base font-medium outline-none"
-                        />
-                    </div>
-                    {location && (
-                        <button onClick={() => setLocation('')} className="w-6 h-6 rounded-full bg-[#636366] flex items-center justify-center">
-                            <X className="w-3.5 h-3.5 text-white" />
+                        >
+                            <span className="flex items-center justify-center gap-2">
+                                <AlertTriangle className="w-4 h-4" />
+                                {recordable ? 'Yes' : 'No'}
+                            </span>
                         </button>
-                    )}
+                    </div>
                 </div>
 
-                {/* Injury/illness type */}
-                <button
-                    className="w-full flex items-center justify-between border-b border-[#3A3A3C] py-4 active:bg-[#2C2C2E] transition-colors"
-                >
-                    <div className="flex-1">
-                        <div className="text-[#98989D] text-xs mb-0.5">Injury/illness type</div>
-                        <input
-                            type="text"
-                            value={injuryType}
-                            onChange={(e) => setInjuryType(e.target.value)}
-                            placeholder="Select type"
-                            className="w-full bg-transparent text-white placeholder-[#636366] text-base outline-none"
-                        />
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-[#636366]" />
-                </button>
+                {/* Incident Details Section */}
+                <div>
+                    <h3 className="text-[#FF6633] text-sm font-bold uppercase tracking-wide mb-4">
+                        Incident Details
+                    </h3>
 
-                {/* Expandable sections */}
-                <div className="mt-6 space-y-0">
-                    {/* Employee Info */}
-                    <div className="border-b border-[#3A3A3C] py-4">
-                        <label className="text-white text-base font-semibold block mb-2">
-                            Injured employee info
-                        </label>
-                        <textarea
-                            value={employeeInfo}
-                            onChange={(e) => setEmployeeInfo(e.target.value)}
-                            placeholder="Enter employee details..."
-                            className="w-full bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl px-4 py-3 text-white placeholder-[#636366] text-sm outline-none focus:ring-2 focus:ring-[#FF6633] min-h-[80px]"
-                        />
-                    </div>
+                    <div className="space-y-4">
+                        {/* Date & Time */}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label htmlFor="incidentDate" className="block text-[#98989D] text-sm font-medium mb-2">Date</label>
+                                <input
+                                    id="incidentDate"
+                                    type="date"
+                                    value={incidentDate}
+                                    onChange={(e) => setIncidentDate(e.target.value)}
+                                    className="w-full bg-[#2C2C2E] text-white px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633] text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="incidentTime" className="block text-[#98989D] text-sm font-medium mb-2">Time</label>
+                                <input
+                                    id="incidentTime"
+                                    type="time"
+                                    value={incidentTime}
+                                    onChange={(e) => setIncidentTime(e.target.value)}
+                                    className="w-full bg-[#2C2C2E] text-white px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633] text-sm"
+                                />
+                            </div>
+                        </div>
 
-                    {/* Investigation */}
-                    <div className="border-b border-[#3A3A3C] py-4">
-                        <label className="text-white text-base font-semibold block mb-2">
-                            Incident investigation
-                        </label>
-                        <textarea
-                            value={investigation}
-                            onChange={(e) => setInvestigation(e.target.value)}
-                            placeholder="Describe the investigation..."
-                            className="w-full bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl px-4 py-3 text-white placeholder-[#636366] text-sm outline-none focus:ring-2 focus:ring-[#FF6633] min-h-[80px]"
-                        />
-                    </div>
+                        {/* Location */}
+                        <div>
+                            <label htmlFor="location" className="block text-[#98989D] text-sm font-medium mb-2">Location</label>
+                            <input
+                                id="location"
+                                type="text"
+                                value={location}
+                                onChange={(e) => setLocation(e.target.value)}
+                                placeholder="Enter incident location"
+                                className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633]"
+                            />
+                        </div>
 
-                    {/* Outcome */}
-                    <div className="border-b border-[#3A3A3C] py-4">
-                        <label className="text-white text-base font-semibold block mb-2">
-                            Incident outcome
-                        </label>
-                        <textarea
-                            value={outcome}
-                            onChange={(e) => setOutcome(e.target.value)}
-                            placeholder="Describe the outcome..."
-                            className="w-full bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl px-4 py-3 text-white placeholder-[#636366] text-sm outline-none focus:ring-2 focus:ring-[#FF6633] min-h-[80px]"
-                        />
+                        {/* Injury Type */}
+                        <div>
+                            <label htmlFor="injuryType" className="block text-[#98989D] text-sm font-medium mb-2">Injury / Illness Type</label>
+                            <input
+                                id="injuryType"
+                                type="text"
+                                value={injuryType}
+                                onChange={(e) => setInjuryType(e.target.value)}
+                                placeholder="e.g. Laceration, Sprain, Chemical Exposure"
+                                className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633]"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Additional Info Section */}
+                <div>
+                    <h3 className="text-[#FF6633] text-sm font-bold uppercase tracking-wide mb-4">
+                        Additional Information
+                    </h3>
+
+                    <div className="space-y-4">
+                        <div>
+                            <label htmlFor="employeeInfo" className="block text-[#98989D] text-sm font-medium mb-2">Injured Employee Info</label>
+                            <textarea
+                                id="employeeInfo"
+                                value={employeeInfo}
+                                onChange={(e) => setEmployeeInfo(e.target.value)}
+                                placeholder="Name, role, department..."
+                                rows={3}
+                                className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633] resize-none"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="investigation" className="block text-[#98989D] text-sm font-medium mb-2">Investigation Notes</label>
+                            <textarea
+                                id="investigation"
+                                value={investigation}
+                                onChange={(e) => setInvestigation(e.target.value)}
+                                placeholder="Describe the investigation details..."
+                                rows={3}
+                                className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633] resize-none"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="outcome" className="block text-[#98989D] text-sm font-medium mb-2">Outcome</label>
+                            <textarea
+                                id="outcome"
+                                value={outcome}
+                                onChange={(e) => setOutcome(e.target.value)}
+                                placeholder="Describe the outcome..."
+                                rows={3}
+                                className="w-full bg-[#2C2C2E] text-white placeholder-[#98989D] px-4 py-3 rounded-xl outline-none border border-[#3A3A3C] focus:ring-2 focus:ring-[#FF6633] resize-none"
+                            />
+                        </div>
                     </div>
                 </div>
 
                 {/* Photos */}
-                <div className="mt-6 mb-6">
-                    <label className="text-white text-sm font-medium mb-3 block">Photos</label>
-                    <div className="flex gap-3 mb-4">
-                        <button
-                            onClick={() => cameraInputRef.current?.click()}
-                            className="flex-1 bg-[#2C2C2E] border border-[#3A3A3C] text-white py-3 rounded-xl flex items-center justify-center gap-2 active:bg-[#3A3A3C] transition-colors"
-                        >
-                            <Camera className="w-5 h-5 text-[#FF6633]" />
-                            <span className="text-sm">Camera</span>
-                        </button>
-                        <button
-                            onClick={() => fileInputRef.current?.click()}
-                            className="flex-1 bg-[#2C2C2E] border border-[#3A3A3C] text-white py-3 rounded-xl flex items-center justify-center gap-2 active:bg-[#3A3A3C] transition-colors"
-                        >
-                            <Upload className="w-5 h-5 text-[#FF6633]" />
-                            <span className="text-sm">Upload</span>
-                        </button>
-                    </div>
-                    <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleFileUpload} className="hidden" />
-                    <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFileUpload} className="hidden" />
+                <div>
+                    <label className="block text-white text-sm font-medium mb-3">Photos</label>
 
                     {photos.length > 0 && (
-                        <div className="grid grid-cols-3 gap-2">
-                            {photos.map((src, i) => (
-                                <div key={i} className="relative aspect-square">
-                                    <img src={src} alt="" className="w-full h-full object-cover rounded-xl border border-[#3A3A3C]" />
+                        <div className="grid grid-cols-3 gap-3 mb-3">
+                            {photos.map((photo, index) => (
+                                <div key={index} className="relative aspect-square">
+                                    <img src={photo} alt={`Photo ${index + 1}`} className="w-full h-full object-cover rounded-xl border border-[#3A3A3C]" />
                                     <button
-                                        onClick={() => removePhoto(i)}
-                                        className="absolute -top-2 -right-2 w-6 h-6 bg-[#FF453A] rounded-full flex items-center justify-center shadow"
+                                        type="button"
+                                        onClick={() => removePhoto(index)}
+                                        className="absolute -top-2 -right-2 w-7 h-7 bg-[#FF453A] rounded-full flex items-center justify-center touch-manipulation shadow-lg"
+                                        aria-label={`Remove photo ${index + 1}`}
                                     >
-                                        <X className="w-3.5 h-3.5 text-white" />
+                                        <X className="w-4 h-4 text-white" />
                                     </button>
                                 </div>
                             ))}
                         </div>
                     )}
+
+                    <div className="flex gap-3">
+                        <button
+                            type="button"
+                            onClick={() => cameraInputRef.current?.click()}
+                            className="flex-1 bg-[#2C2C2E] border border-[#3A3A3C] text-white py-3 rounded-xl flex items-center justify-center gap-2 active:bg-[#3A3A3C] transition-colors touch-manipulation"
+                        >
+                            <Camera className="w-5 h-5" aria-hidden="true" />
+                            <span className="font-medium">Take Photo</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="flex-1 bg-[#2C2C2E] border border-[#3A3A3C] text-white py-3 rounded-xl flex items-center justify-center gap-2 active:bg-[#3A3A3C] transition-colors touch-manipulation"
+                        >
+                            <Upload className="w-5 h-5" aria-hidden="true" />
+                            <span className="font-medium">Upload</span>
+                        </button>
+                    </div>
+
+                    <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleFileUpload} className="hidden" />
+                    <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFileUpload} className="hidden" />
                 </div>
+            </form>
+
+            {/* Fixed Bottom Submit Button */}
+            <div className="fixed bottom-0 left-0 right-0 bg-[#1C1C1E] border-t border-[#3A3A3C] p-4 pb-8">
+                <p className="text-[#FF6633] text-sm font-medium mb-2 text-center" aria-live="polite">
+                    Reporting for: {formatReportDateLabel(getReportDate())}
+                </p>
+                <button
+                    type="submit"
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className="w-full bg-[#FF6633] text-white py-4 rounded-xl font-semibold text-base active:opacity-80 transition-opacity disabled:opacity-50 touch-manipulation shadow-lg flex items-center justify-center gap-2"
+                >
+                    {isSubmitting ? (
+                        <>
+                            <Spinner size="md" className="border-white border-t-transparent" />
+                            <span>Submitting...</span>
+                        </>
+                    ) : (
+                        'Submit Incident'
+                    )}
+                </button>
             </div>
         </div>
     );

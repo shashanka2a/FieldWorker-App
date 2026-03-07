@@ -276,13 +276,14 @@ export function Home() {
       route: '/incidents',
       svg: (
         <svg width="100%" height="100%" viewBox="0 0 34 34" fill="none">
-          {/* Hard hat shape */}
-          <path d="M7 22h20v2a3 3 0 01-3 3H10a3 3 0 01-3-3v-2z" fill="#FF6633" opacity="0.3" />
-          <path d="M8 22c0-7 3.5-12 9-12s9 5 9 12" stroke="#FF6633" strokeWidth="2" strokeLinecap="round" />
-          <line x1="6" y1="22" x2="28" y2="22" stroke="#FF6633" strokeWidth="2" strokeLinecap="round" />
-          {/* Exclamation mark */}
-          <circle cx="17" cy="16" r="1.5" fill="#FF6633" />
-          <line x1="17" y1="10" x2="17" y2="14" stroke="#FF6633" strokeWidth="2" strokeLinecap="round" />
+          {/* Warning triangle base */}
+          <path d="M17 4L3 28h28L17 4z" fill="white" stroke="#E5E5EA" strokeWidth="0.5" strokeLinejoin="round" />
+          {/* Orange fill band at bottom */}
+          <path d="M7 24l10-18 10 18H7z" fill="#FF6633" opacity="0.15" />
+          {/* Exclamation line */}
+          <line x1="17" y1="12" x2="17" y2="20" stroke="#FF6633" strokeWidth="2.5" strokeLinecap="round" />
+          {/* Exclamation dot */}
+          <circle cx="17" cy="24" r="1.5" fill="#FF6633" />
         </svg>
       ),
     },
@@ -292,10 +293,16 @@ export function Home() {
       route: '/observations',
       svg: (
         <svg width="100%" height="100%" viewBox="0 0 34 34" fill="none">
-          {/* Eye shape */}
-          <path d="M4 17s5-9 13-9 13 9 13 9-5 9-13 9S4 17 4 17z" fill="#FF6633" opacity="0.15" stroke="#FF6633" strokeWidth="1.5" />
-          <circle cx="17" cy="17" r="4" fill="white" stroke="#FF6633" strokeWidth="1.5" />
-          <circle cx="17" cy="17" r="2" fill="#FF6633" />
+          {/* Clipboard base */}
+          <rect x="6" y="5" width="22" height="26" rx="3" fill="white" stroke="#E5E5EA" strokeWidth="0.5" />
+          {/* Clip at top */}
+          <rect x="12" y="3" width="10" height="5" rx="2" fill="#E5E5EA" stroke="#C7C7CC" strokeWidth="0.5" />
+          {/* Magnifying glass circle */}
+          <circle cx="16" cy="18" r="5" fill="#FF6633" opacity="0.15" stroke="#FF6633" strokeWidth="1.5" />
+          {/* Magnifying glass handle */}
+          <line x1="20" y1="22" x2="24" y2="26" stroke="#FF6633" strokeWidth="2" strokeLinecap="round" />
+          {/* Eye in center of glass */}
+          <circle cx="16" cy="18" r="2" fill="#FF6633" />
         </svg>
       ),
     },
