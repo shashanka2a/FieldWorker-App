@@ -135,6 +135,22 @@ export interface IncidentEntry {
   photos?: string[];
 }
 
+export interface ObservationEntry {
+  id: string;
+  project: { name: string };
+  timestamp: string;
+  category: 'negative' | 'positive';
+  type: string;
+  status: 'open' | 'closed';
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  description: string;
+  assignee: string;
+  dueDate: string;
+  resolution: string;
+  resolutionPhotos?: string[];
+  photos?: string[];
+}
+
 export interface SignedReportEntry {
   signedAt: string;
   preparedBy: string;
@@ -153,6 +169,7 @@ const STORAGE_KEYS = {
   material: (d: string) => `material_${d}`,
   attachments: (d: string) => `attachments_${d}`,
   incidents: (d: string) => `incidents_${d}`,
+  observations: (d: string) => `observations_${d}`,
   signed: (d: string) => `report_signed_${d}`,
 } as const;
 
@@ -224,6 +241,14 @@ export function updateIncident(dateKey: string, updatedEntry: IncidentEntry): vo
     arr[idx] = updatedEntry;
     writeArray(key, arr);
   }
+}
+
+export function saveObservation(dateKey: string, entry: ObservationEntry): void {
+  appendEntry(STORAGE_KEYS.observations, dateKey, entry);
+}
+
+export function getObservations(dateKey: string): ObservationEntry[] {
+  return readArray<ObservationEntry>(STORAGE_KEYS.observations(dateKey));
 }
 
 export function saveEquipmentChecklist(dateKey: string, entry: EquipmentChecklistEntry): void {
@@ -302,6 +327,7 @@ export interface ReportData {
   equipment: EquipmentOrChecklistEntry[];
   attachments: AttachmentEntry[];
   incidents: IncidentEntry[];
+  observations: ObservationEntry[];
   signed: SignedReportEntry | null;
 }
 
@@ -319,6 +345,7 @@ export function getReportForDate(date: Date, projectName: string = "North Valley
     equipment: readArray<EquipmentOrChecklistEntry>(STORAGE_KEYS.equipment(dateKey)),
     attachments: readArray<AttachmentEntry>(STORAGE_KEYS.attachments(dateKey)),
     incidents: readArray<IncidentEntry>(STORAGE_KEYS.incidents(dateKey)),
+    observations: readArray<ObservationEntry>(STORAGE_KEYS.observations(dateKey)),
     signed: getSignedReport(dateKey),
   };
 }

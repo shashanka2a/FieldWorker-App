@@ -358,6 +358,72 @@ export function ReportPreview({
           </div>
         )}
 
+        {/* --- Observations (only if logged) --- */}
+        {data.observations && data.observations.length > 0 && (
+          <div className="px-7 mt-5">
+            <div
+              className="py-2 px-4 text-white font-bold text-[15px] uppercase tracking-wide"
+              style={{ backgroundColor: ORANGE, letterSpacing: "0.5px" }}
+            >
+              Observations
+            </div>
+            <div className="border border-[#ddd] border-t-0 px-4 py-4">
+              <div className="space-y-4">
+                {data.observations.map((obs, idx) => {
+                  const priorityColors: Record<string, string> = {
+                    low: '#4CAF50', medium: '#FF9800', high: '#FF6633', critical: '#F44336',
+                  };
+                  return (
+                    <div key={obs.id} className={idx > 0 ? "border-t border-[#eee] pt-4" : ""}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <strong className="text-[13px] text-[#222]">{obs.type || "Untitled"}</strong>
+                        <span
+                          className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded text-white"
+                          style={{ backgroundColor: obs.category === 'negative' ? '#F44336' : '#4CAF50' }}
+                        >
+                          {obs.category}
+                        </span>
+                        <span
+                          className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded"
+                          style={{
+                            backgroundColor: obs.status === "open" ? "#FFF3E0" : "#E8F5E9",
+                            color: obs.status === "open" ? "#E65100" : "#2E7D32",
+                          }}
+                        >
+                          {obs.status}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[12px]">
+                        <div>
+                          <strong>Priority:</strong>{" "}
+                          <span style={{ color: priorityColors[obs.priority] || "#333", fontWeight: 700 }}>
+                            {obs.priority.charAt(0).toUpperCase() + obs.priority.slice(1)}
+                          </span>
+                        </div>
+                        {obs.assignee && <div><strong>Assignee:</strong> {obs.assignee}</div>}
+                        {obs.dueDate && <div><strong>Due:</strong> {obs.dueDate}</div>}
+                      </div>
+                      {obs.description && (
+                        <div className="mt-2 text-[12px]"><strong>Description:</strong> {obs.description}</div>
+                      )}
+                      {obs.resolution && (
+                        <div className="mt-1 text-[12px]"><strong>Resolution:</strong> {obs.resolution}</div>
+                      )}
+                      {(obs.photos ?? []).length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {(obs.photos ?? []).map((src, j) => (
+                            <img key={j} src={src} alt="" className="w-16 h-16 object-cover border border-[#ddd]" />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* --- Equipment Checklist --- */}
         <div className="px-7 mt-8">
           <div

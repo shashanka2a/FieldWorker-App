@@ -287,6 +287,19 @@ export function Home() {
       ),
     },
     {
+      id: 'observations',
+      name: 'Observations',
+      route: '/observations',
+      svg: (
+        <svg width="100%" height="100%" viewBox="0 0 34 34" fill="none">
+          {/* Eye shape */}
+          <path d="M4 17s5-9 13-9 13 9 13 9-5 9-13 9S4 17 4 17z" fill="#FF6633" opacity="0.15" stroke="#FF6633" strokeWidth="1.5" />
+          <circle cx="17" cy="17" r="4" fill="white" stroke="#FF6633" strokeWidth="1.5" />
+          <circle cx="17" cy="17" r="2" fill="#FF6633" />
+        </svg>
+      ),
+    },
+    {
       id: 'report',
       name: 'Report',
       route: '/report/preview',
@@ -313,7 +326,7 @@ export function Home() {
   const hasDataForSelectedDate = () => {
     if (typeof window === 'undefined') return false;
     const dateKey = getDateKey(selectedDate);
-    const dataTypes = ['notes', 'chemicals', 'metrics', 'survey', 'equipment', 'attachments', 'material', 'incidents'];
+    const dataTypes = ['notes', 'chemicals', 'metrics', 'survey', 'equipment', 'attachments', 'material', 'incidents', 'observations'];
 
     return dataTypes.some(type => {
       const key = `${type}_${dateKey}`;
