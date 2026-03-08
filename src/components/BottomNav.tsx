@@ -48,7 +48,7 @@ export function BottomNav({ activeTab }: BottomNavProps) {
               key={tab.id}
               onClick={() => handleNav(tab.path)}
               disabled={!!navigatingTo}
-              className={`flex flex-col items-center justify-center gap-1.5 flex-1 h-full touch-manipulation focus:outline-none disabled:opacity-70 transition-colors ${isActive ? 'text-[#FF6633]' : 'text-[#AEAEB2]'
+              className={`flex flex-col items-center justify-center gap-1.5 flex-1 h-full touch-manipulation focus:outline-none disabled:opacity-70 transition-colors ${isActive ? 'text-[#0A84FF]' : 'text-[#AEAEB2]'
                 }`}
               aria-label={tab.label}
               aria-current={isActive ? 'page' : undefined}
