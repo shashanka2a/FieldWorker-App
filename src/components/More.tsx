@@ -69,27 +69,29 @@ export function More() {
       {/* Header */}
       <header className="bg-[#2C2C2E] border-b border-[#3A3A3C] px-4 py-3 sticky top-0 z-20">
         <h1 className="text-white text-lg font-bold">More</h1>
+        <p className="text-[#98989D] text-xs mt-0.5">Additional features and settings</p>
       </header>
 
       {/* Profile Section */}
-      <div className="px-4 mt-3 mb-3">
-        <div className="bg-[#FF6633] rounded-xl p-3.5">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-white text-base font-bold">
+      <div className="px-4 mt-4 mb-4">
+        <div className="bg-[#FF6633] rounded-xl p-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-white text-lg font-bold">
                 {currentUser.name.split(' ').map(n => n[0]).join('')}
               </span>
             </div>
             <div className="min-w-0">
               <div className="text-white text-base font-bold leading-tight">{currentUser.name}</div>
-              <div className="text-white/85 text-xs">{currentUser.role} · {currentUser.email}</div>
+              <div className="text-white/90 text-xs mt-0.5">{currentUser.role}</div>
+              <div className="text-white/70 text-xs">{currentUser.email}</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Menu Items */}
-      <div className="px-4 mb-3 space-y-2">
+      <div className="px-4 mb-4 space-y-2.5">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isLoading = navigatingTo === item.route;
@@ -101,7 +103,7 @@ export function More() {
                 router.push(item.route);
               }}
               disabled={!!navigatingTo}
-              className="w-full bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl p-3 flex items-center gap-3 active:bg-[#3A3A3C] transition-colors disabled:opacity-70"
+              className="w-full bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl p-3.5 flex items-center gap-3.5 active:bg-[#3A3A3C] transition-colors disabled:opacity-70"
             >
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
@@ -127,7 +129,7 @@ export function More() {
         <button
           onClick={handleSignOut}
           disabled={signingOut}
-          className="w-full bg-[#2C2C2E] border border-[#FF453A]/40 rounded-xl p-3 flex items-center gap-3 active:bg-[#3A3A3C] transition-colors disabled:opacity-70"
+          className="w-full bg-[#2C2C2E] border border-[#FF453A]/40 rounded-xl p-3.5 flex items-center gap-3.5 active:bg-[#3A3A3C] transition-colors disabled:opacity-70"
         >
           <div className="w-10 h-10 bg-[#FF453A]/15 rounded-xl flex items-center justify-center flex-shrink-0">
             {signingOut ? (
